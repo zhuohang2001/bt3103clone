@@ -1,46 +1,37 @@
-<script setup>
-
+<script>
+  export default{
+    name: 'App' 
+  }
 </script>
 
 <template>
-  <header>
-    <img alt="Wanderer's Marketplace logo" class="logo" src="../images/logo_with_words.png" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div id ="nav">
+    <router-link to = "/"> Home </router-link> |
+    <router-link to = "/marketplace"> Marketplace </router-link>
+  </div>
+  <router-view/>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+<style>
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 30px;
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
+  #nav{
+    padding : 30px;
   }
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+  #nav a {
+    font-weight: bold;
+    color: #2c3e50;
   }
-}
+
+  #nav a.router-link-exact-active {
+    color: #42b983;
+  }
 </style>
