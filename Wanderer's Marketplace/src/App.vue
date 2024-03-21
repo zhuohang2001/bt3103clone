@@ -5,12 +5,14 @@
 </script>
 
 <template>
-  <div id ="nav">
-    <router-link to = "/"> Home </router-link> |
-    <router-link to = "/marketplace"> Marketplace </router-link>
-  </div>
-  <div>
-    <router-view/>
+  <div id="app">
+    <div id ="nav">
+      <router-link to = "/"> Home </router-link> |
+      <router-link to = "/marketplace"> Marketplace </router-link>
+    </div>
+    <div id="content">
+      <router-view/>
+    </div>
   </div>
 </template>
 
@@ -21,11 +23,13 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin-top: 30px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
   }
 
   #nav{
-    padding : 30px;
+    padding : 10px;
   }
 
   #nav a {
