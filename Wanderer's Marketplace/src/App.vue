@@ -9,7 +9,9 @@
     <router-link to = "/"> Home </router-link> |
     <router-link to = "/marketplace"> Marketplace </router-link>
   </div>
-  <router-view/>
+  <div>
+    <router-view/>
+  </div>
 </template>
 
 <style>
@@ -27,11 +29,11 @@
   }
 
   #nav a {
-    font-weight: bold;
     color: #2c3e50;
   }
 
   #nav a.router-link-exact-active {
-    color: #42b983;
+    font-weight: bold;
+    color: #051e55;
   }
 </style>
