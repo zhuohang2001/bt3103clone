@@ -1,15 +1,9 @@
-<script>
-  export default{
-    name: 'App' 
-  }
-</script>
-
 <template>
   <div id="app">
-    <div id ="nav">
+    <div id ="nav" >
       <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="">
       <div id="nav-links">
-        <router-link to = "/"> Home </router-link> |
+        <router-link to = "/home"> Home </router-link> |
         <router-link to = "/marketplace"> Marketplace </router-link> |
         <router-link to = "/profile"> Profile </router-link>
       </div>
@@ -19,6 +13,17 @@
     </div>
   </div>
 </template>
+
+<script>
+  export default{
+    name: 'App' ,
+    data() {
+      return {
+        loggedIn: false
+      }
+    }
+  }
+</script>
 
 <style>
   #LogoTopLeft {
