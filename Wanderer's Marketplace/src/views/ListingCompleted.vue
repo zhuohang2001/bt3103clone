@@ -1,20 +1,24 @@
 <template>
-	<div>
-		<ProductDetails />
-		<button class="leave-rating-button" @click="leaveRating">
-			Leave Rating
-		</button>
+	<div class="product-details-container">
+		<div class="left">
+			<ProductImage />
+		</div>
+		<div class="right">
+			<ProductDetails />
+			<button class="leave-rating-button" @click="leaveRating">
+				Leave Rating
+			</button>
+		</div>
 	</div>
 </template>
 
 <script>
-import ProductDetails from "../components/marketplace_components/ProductDetails.vue";
+import ProductImage from "../components/listing_components/ProductImage.vue";
+import ProductDetails from "../components/listing_components/ProductDetails.vue";
 
 export default {
 	name: "ListingCompleted",
-	components: {
-		ProductDetails,
-	},
+	components: { ProductImage, ProductDetails },
 	data() {
 		return {
 			productDetails: {
@@ -40,13 +44,31 @@ export default {
 </script>
 
 <style scoped>
+.product-details-container {
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	height: calc(100vh - 80px);
+	padding: 50px;
+	gap: 25px;
+}
+
+.left {
+	flex: 1;
+}
+
+.right {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+}
+
 .leave-rating-button {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
 	padding: 10px 20px;
 	border: none;
-	border-radius: 5px;
+	border-radius: 30px;
 	background-color: #051e55;
 	color: #fff;
 	cursor: pointer;

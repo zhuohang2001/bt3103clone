@@ -78,8 +78,9 @@ export default {
 <style scoped>
 .product-details {
 	background-color: #fff1e7;
-	border-radius: 10px;
+	border-radius: 20px;
 	padding: 1rem;
+	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
 }
 
 .title {
