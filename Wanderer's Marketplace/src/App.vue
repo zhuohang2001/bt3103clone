@@ -41,6 +41,7 @@ export default {
 	flex-direction: column;
 	width: 100%;
 	min-height: 100vh;
+	background-color: #b3e3eb;
 }
 
 #nav {
@@ -49,8 +50,11 @@ export default {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-right: 15px;
-	margin-left: 15px;
+	border-bottom: 1px solid #051e55;
+	background-color: #ffffff;
+	position: fixed;
+	top: 0;
+	width: calc(100% - 20px);
 }
 
 #nav-links {
@@ -69,7 +73,11 @@ export default {
 }
 
 #content {
-  flex: 1;
-	background-color: #b3e3eb;
+	flex: 1;
+	padding-top: 80px;
+}
+
+body {
+	margin: 0;
 }
 </style>
