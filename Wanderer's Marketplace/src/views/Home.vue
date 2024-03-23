@@ -43,7 +43,6 @@ export default {
   }
 
   #SecondDiv, #FourthDiv {
-    background-color: #b3e3eb;
     height: 360px;
     display: flex;
     justify-content: left;
