@@ -1,12 +1,11 @@
 <template>
   <div class="marketplace-container">
-    <FilterSidebar />
-    <ProductListing />
+    <FilterSidebar :filters="filters" @apply-filters="fetchProducts" />
+    <ProductListing :products="products" />
   </div>
 </template>
 
 <script>
-// Import the components
 import FilterSidebar from '../components/marketplace_components/FilterSidebar.vue'
 import ProductListing from '../components/marketplace_components/ProductListing.vue';
 
@@ -15,9 +14,34 @@ export default {
   components: {
     FilterSidebar,
     ProductListing
+  },
+  data() {
+    return {
+      filters: {
+        search: '',
+        category: '',
+        sort: '',
+        country: '',
+        maxPrice: null,
+        minDeliveryFee: null,
+        maxDeliveryFee: null
+      },
+      products: []
+    };
+  },
+  methods: {
+    fetchProducts() {
+      // Logic to fetch products based on the filters
+      // This will involve making a request to your backend service with the filter parameters
+      // Then, update the `products` array with the response data
+    }
+  },
+  created() {
+    this.fetchProducts(); // Fetch initial product listings without any filters
   }
 }
 </script>
+
 
 <style scoped>
 .marketplace-container {
