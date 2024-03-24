@@ -7,30 +7,59 @@
       <h2>Account Login</h2>
       <h5 class = "grey-text">If you are already a member, please login <br> with your email adddress and password.</h5>
       <label for="email">Email Address </label><br>
-      <input type="email" id="email" name="email" class = "input-field"><br><br>
+      <input type="email" id="email" name="email" class = "input-field" v-model="email"><br><br>
       <label for="password">Password </label><br>
-      <input type="password" id="password" name="password" class = "input-field"><br><br>
+      <input type="password" id="password" name="password" class = "input-field" v-model="password"><br><br>
       <input type="checkbox" id="rememberMe" name="rememberMe">
-      <label for="rememberMe">Remember me</label><br><br>
-      <button class="login-button" @click = "login">Login</button>
+      <label for="rememberMe"> Remember me</label><br><br>
+      <button class="login-button" @click = "login()">Login</button>
+      <div v-if="error" class="error-message">{{ error }}</div>
+      <div class="additional-text">
+        <p>Don't have an account? Sign up here</p>
+        <p>Forgot password? Reset here</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import app from "../firebase.js";
 export default {
   name: 'Login',
   data() {
     return {
-      loggedIn: false
+      email: '',
+      password: '',
+      error: '',
+      user: null,
     };
   },
+  mounted() {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      console.log("Authentication state changed: ", user.email);
+      if (user) {
+        this.user = user;
+        console.log('User is logged in');
+      } else {
+        console.log("User is not logged in.")
+      }
+    })  
+  },
   methods: {
-    login() {
-      // Logic for login, then set loggedIn to true
-      this.loggedIn = true;
-      // Perform login logic here
-      this.$router.push('/home');
+    async login() {
+      try {
+        // Call the Firebase signInWithEmailAndPassword method to authenticate the user
+        const auth = getAuth();
+        await signInWithEmailAndPassword(auth, this.email, this.password)
+        // If authentication is successful, redirect to home
+        this.$router.push('/home');
+      } catch (error) {
+        // Handle authentication errors here
+        this.error = error.message;
+        console.error('Error signing in:', error.message);
+      }
     }
   }
 }
@@ -49,20 +78,28 @@ export default {
 }
 
 .login-logo img {
-  width: 100%; /* Make sure image fills its container */
+  width: 70%; /* Make sure image fills its container */
   height: auto; /* Maintain aspect ratio */
 }
 
 .login-form {
   flex: 1; /* Take up remaining space */
-  background-color: #b3e3eb;
+  position: relative;
+  text-align: center;
+  width: 300px;
+}
+
+.login-form::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  bottom: -30px;
+  left: calc( 7%); /* Adjust the position of the line */
+  width: 2px; /* Width of the line */
+  background-color: #051E55; /* Color of the line */
 }
 .grey-text{
   color: #717171;
-}
-.login-form{
-  display: inline-block;
-  text-align: left;
 }
 
 form{
@@ -72,6 +109,7 @@ form{
 }
 .input-field {
   width: 300px; /* Adjust the width of the input fields */
+  box-sizing: border-box;
 }
 
 .login-button {
@@ -82,5 +120,10 @@ form{
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  width: 300px;
+}
+
+.additional-text {
+  text-align: center;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<div id="nav">
+		<div id="nav" v-if = "user && !isLoginPage">
 			<img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" />
 			<div id="nav-links">
 				<router-link to="/home"> Home </router-link> |
@@ -15,14 +15,35 @@
 </template>
 
 <script>
+import {onAuthStateChanged, getAuth} from "firebase/auth";
+
 export default {
 	name: "App",
 	data() {
 		return {
-			loggedIn: false,
+			user: false,
+      isLoginPage: false
 		};
 	},
+  mounted() {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.user = user;
+      }
+    })  
+    // Check if the current route is the login page
+    this.isLoginPage = this.$route.path === '/'; 
+  },
+  watch: {
+    $route(to) {
+      // Update isLoginPage when the route changes
+      this.isLoginPage = to.path === "/";
+    }
+  }
 };
+
+
 </script>
 
 <style>
