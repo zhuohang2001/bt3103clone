@@ -94,7 +94,63 @@ export default {
   },
   methods: {
     applyFilters() {
-      // Logic to apply filters
+      // Reference to the Firestore collection
+      const listingsRef = firebase.firestore().collection('listings');
+
+      // Start constructing the query
+      let query = listingsRef;
+
+      // Filter by category if one is selected
+      if (this.category) {
+        query = query.where('Category', '==', this.category);
+      }
+
+      // Add more filters as necessary, based on the search terms and other filter criteria
+      if (this.search) {
+        query = query.where('ProductName', '>=', this.search).where('ProductName', '<=', this.search + '\uf8ff');
+      }
+
+      if (this.country) {
+        query = query.where('Country', '==', this.country);
+      }
+
+      // For price range, you need to ensure you have both min and max set to apply this filter
+      if (this.maxPrice !== null) {
+        query = query.where('MaxProductPrice', '<=', this.maxPrice);
+      }
+
+      if (this.minDeliveryFee !== null && this.maxDeliveryFee !== null) {
+        query = query.where('DeliveryFee', '>=', this.minDeliveryFee)
+                     .where('DeliveryFee', '<=', this.maxDeliveryFee);
+      }
+
+      // Now, execute the query
+      query.get().then(snapshot => {
+        if (snapshot.empty) {
+          console.log('No matching documents.');
+          return;
+        }  
+
+        // Clear the current products
+        this.products = [];
+
+        snapshot.forEach(doc => {
+          // Push each matching listing into the products array
+          this.products.push(doc.data());
+        });
+
+        this.$emit('filters-applied', {
+          search: this.search,
+          category: this.category,
+          country: this.country,
+          maxPrice: this.maxPrice,
+          minDeliveryFee: this.minDeliveryFee,
+          maxDeliveryFee: this.maxDeliveryFee
+      });
+      })
+      .catch(error => {
+        console.log("Error getting documents: ", error);
+      });
     },
     resetFilters() {
       // Logic to reset all filters to their default state
