@@ -15,11 +15,11 @@ a,
   font-size: 20px;
 }
 
-@media (hover: hover) {
+/* @media (hover: hover) {
   a:hover {
     background-color: #B3E3EB;
   }
-}
+} */
 
 /*@media (min-width: 1024px) {
   body {
