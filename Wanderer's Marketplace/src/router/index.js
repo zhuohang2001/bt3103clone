@@ -4,6 +4,7 @@ import Home from "@/views/Home.vue";
 import Marketplace from "@/views/Marketplace.vue";
 import Profile from "@/views/Profile.vue";
 import ListingCompleted from "@/views/ListingCompleted.vue";
+import AddNewListing from "@/views/AddNewListing.vue";
 
 const routes = [
 	{
@@ -30,6 +31,11 @@ const routes = [
 		path: "/listingcompleted",
 		name: "ListingCompleted",
 		component: ListingCompleted,
+	},
+	{
+		path: "/addnewlisting",
+		name: "AddNewListing",
+		component: AddNewListing,
 	},
 ];
 

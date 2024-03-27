@@ -8,7 +8,7 @@ export default {
   <div id="container">
     <div id="FirstDiv">
       <h1 id="YourPurchases">Your Purchases</h1>
-      <button class="button" id="AddNewListingButton" type="button"><span>Add New Listing</span></button>
+      <router-link to="/addnewlisting"><button class="button" id="AddNewListingButton" type="button"><span>Add New Listing</span></button></router-link>
     </div>
     
     <div id="SecondDiv" class="scroll">
