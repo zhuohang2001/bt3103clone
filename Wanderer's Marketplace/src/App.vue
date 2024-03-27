@@ -14,6 +14,7 @@
 	</div>
 </template>
 
+
 <script>
 import {onAuthStateChanged, getAuth} from "firebase/auth";
 
