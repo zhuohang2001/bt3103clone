@@ -1,7 +1,8 @@
 <template>
 	<div id="app">
 		<div id="nav" v-if = "user && !isLoginPage">
-			<img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" />
+			<!-- <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /> -->
+			<router-link to="/home"><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /></router-link>
 			<div id="nav-links">
 				<router-link to="/home"> Home </router-link> |
 				<router-link to="/marketplace"> Marketplace </router-link> |
@@ -13,7 +14,6 @@
 		</div>
 	</div>
 </template>
-
 
 <script>
 import {onAuthStateChanged, getAuth} from "firebase/auth";
@@ -50,6 +50,10 @@ export default {
 <style>
 #LogoTopLeft {
 	height: 80px;
+}
+
+#LogoTopLeft:hover {
+	background-color: transparent;
 }
 
 #app {
