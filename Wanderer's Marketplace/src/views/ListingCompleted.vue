@@ -72,5 +72,6 @@ export default {
 	background-color: #051e55;
 	color: #fff;
 	cursor: pointer;
+	margin-top: 10px;
 }
 </style>
