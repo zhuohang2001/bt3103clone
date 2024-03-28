@@ -22,16 +22,10 @@
         <input type="text" id="cardholderName" name="cardholderName" class="input-field" v-model="cardholderName"><br><br>
         <label for="cardNumber">Card Number</label><br>
         <input type="text" id="cardNumber" name="cardNumber" class="input-field" v-model="cardNumber"><br><br>
-        <div class="row">
-          <div class="col">
-            <label for="CVV">CVV</label><br>
-            <input type="text" id="CVV" name="CVV" class="input-field" v-model="CVV"><br><br>
-          </div>
-          <div class="col">
-            <label for="expiryDate">Expiry Date</label><br>
-            <input type="text" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate"><br><br>
-          </div>
-        </div>
+        <label for="CVV">CVV</label><br>
+        <input type="text" id="CVV" name="CVV" class="input-field" v-model="CVV"><br><br>
+        <label for="expiryDate">Expiry Date</label><br>
+        <input type="month" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate"><br><br>
         <label for="telegramHandle">Telegram Handle</label><br>
         <input type="text" id="telegramHandle" name="telegramHandle" class="input-field" v-model="telegramHandle"><br><br>
         <button class="createaccount-button" @click="login()">Create Account</button>
@@ -157,18 +151,5 @@
     font-size: 15px;
     color:#051E55;
   }
-  
-  .row {
-    display: flex;
-  }
-  
-  .col {
-    flex: 1;
-    margin: 0 20px; /* Adjust margin as needed */
-  }
-  #CVV, #expiryDate {
-    width: 100px; /* Calculate width to fit within half of the container width */
-  }
-  
   </style>
   
