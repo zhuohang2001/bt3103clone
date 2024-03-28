@@ -11,12 +11,12 @@
         <input type="password" id="password" name="password" class="input-field" v-model="password"><br><br>
         <label for="confirmPassword">Confirm Password</label><br>
         <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" v-model="confirmPassword"><br><br>
+        <span v-if="passwordsMatch" class="password-match">Passwords match!</span>
+        <span v-else-if="confirmPassword !== '' && confirmPassword !== password" class="password-mismatch">Passwords do not match!</span>
+        <br><br>
         <label for="country">Country</label><br>
         <select id="country" name="country" class="input-field" v-model="country">
-          <option value="USA">USA</option>
-          <option value="Canada">Canada</option>
-          <option value="UK">UK</option>
-          <!-- Add more options as needed -->
+          <option v-for="(countryName, countryCode) in countryNames" :value="countryCode" :key="countryCode">{{ countryName }}</option>
         </select><br><br>
         <label for="cardholderName">Cardholder Name</label><br>
         <input type="text" id="cardholderName" name="cardholderName" class="input-field" v-model="cardholderName"><br><br>
@@ -28,8 +28,10 @@
         <input type="month" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate"><br><br>
         <label for="telegramHandle">Telegram Handle</label><br>
         <input type="text" id="telegramHandle" name="telegramHandle" class="input-field" v-model="telegramHandle"><br><br>
-        <button class="createaccount-button" @click="login()">Create Account</button>
-        <div v-if="error" class="error-message">{{ error }}</div>
+        <button class="createaccount-button" @click="signUp()">Create Account</button>
+        <div class="error-box" v-if="error">
+          <div class="error-message">{{ error }}</div>
+        </div>
         <div class="additional-text">
           <p>Already have an account?<router-link to="/" class="login-link" >Login here</router-link></p>
         </div>
@@ -39,6 +41,7 @@
   
   <script>
   import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+  import {countries} from 'countries-list';
   import app from "../firebase.js";
   
   export default {
@@ -49,6 +52,7 @@
         password: '',
         confirmPassword: '',
         country: '',
+        countryNames: [],
         cardholderName: '',
         cardNumber: '',
         CVV: '',
@@ -58,7 +62,14 @@
         user: null,
       };
     },
+    computed: {
+      passwordsMatch() {
+        return this.confirmPassword !== '' && this.confirmPassword === this.password;
+      }
+    },
     mounted() {
+      this.countryNames = Object.values(countries).map(country => country.name);
+      this.countryNames.sort();
       const auth = getAuth();
       onAuthStateChanged(auth, (user) => {
         console.log("Authentication state changed: ", user.email);
@@ -71,8 +82,12 @@
       })  
     },
     methods: {
-      async login() {
+      async signUp() {
         try {
+          // Check if the password and confirm password match
+          if (this.password !== this.confirmPassword) {
+            throw new Error("Passwords do not match!");
+          }
           // Call the Firebase createUserWithEmailAndPassword method to create a new user
           const auth = getAuth();
           await createUserWithEmailAndPassword(auth, this.email, this.password);
@@ -142,6 +157,20 @@
     font-size: 14px;
     width: 300px;
   }
+  .error-box {
+  background-color: #ffcccc; /* Red background color */
+  border: 1px solid #ff3333; /* Red border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 20px; /* Add some padding */
+  margin-top: 20px; /* Add some space above the error box */
+  width: 260px;
+  font-size: 14px;
+  margin: 20px auto;
+}
+
+.error-message {
+  color: #ff3333; /* Red text color */
+}
   
   .additional-text {
     text-align: center;
