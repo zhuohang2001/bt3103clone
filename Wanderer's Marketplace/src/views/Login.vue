@@ -15,7 +15,7 @@
       <button class="login-button" @click = "login()">Login</button>
       <div v-if="error" class="error-message">{{ error }}</div>
       <div class="additional-text">
-        <p>Don't have an account? Sign up here</p>
+        <p>Don't have an account?<router-link to="/createaccount" class="signup-link">Sign up here</router-link></p>
         <p>Forgot password? Reset here</p>
       </div>
     </div>
@@ -125,5 +125,9 @@ form{
 
 .additional-text {
   text-align: center;
+}
+.signup-link {
+  color: #051E55;
+  font-size: 15px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<div id="nav" v-if = "user && !isLoginPage">
+		<div id="nav" v-if = "user && !isLoginPage && !isCreateAccountPage">
 			<!-- <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /> -->
 			<router-link to="/home"><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /></router-link>
 			<div id="nav-links">
@@ -23,7 +23,8 @@ export default {
 	data() {
 		return {
 			user: false,
-      isLoginPage: false
+      isLoginPage: false,
+      isCreateAccountPage: false,
 		};
 	},
   mounted() {
@@ -35,11 +36,13 @@ export default {
     })  
     // Check if the current route is the login page
     this.isLoginPage = this.$route.path === '/'; 
+    this.isCreateAccountPage = this.$route.path === '/createaccount'; 
   },
   watch: {
     $route(to) {
       // Update isLoginPage when the route changes
       this.isLoginPage = to.path === "/";
+      this.isCreateAccountPage = to.path === "/createaccount";
     }
   }
 };
