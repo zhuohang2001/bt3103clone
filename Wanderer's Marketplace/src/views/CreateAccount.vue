@@ -5,6 +5,8 @@
       </div>
       <div class="signup-form">
         <h2>Create Your Account</h2>
+        <label for="username">Username</label><br>
+        <input type="text" id="username" name="username" class="input-field" v-model="username"><br><br>
         <label for="email">Email Address</label><br>
         <input type="email" id="email" name="email" class="input-field" v-model="email"><br><br>
         <label for="password">Password</label><br>
@@ -13,7 +15,7 @@
         <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" v-model="confirmPassword"><br><br>
         <span v-if="passwordsMatch" class="password-match">Passwords match!</span>
         <span v-else-if="confirmPassword !== '' && confirmPassword !== password" class="password-mismatch">Passwords do not match!</span>
-        <br><br>
+        <br v-if="password !== '' && confirmPassword !== ''"><br> <!-- Render gap only when passwords are filled -->
         <label for="country">Country</label><br>
         <select id="country" name="country" class="input-field" v-model="country">
           <option v-for="(countryName, countryCode) in countryNames" :value="countryCode" :key="countryCode">{{ countryName }}</option>
@@ -95,7 +97,13 @@
           this.$router.push('/home');
         } catch (error) {
           // Handle account creation errors here
-          this.error = error.message;
+          if (error.code === 'auth/invalid-email') {
+            this.error = "Invalid email format. Please provide a valid email address."; // Custom error message for invalid email
+          } else if (error.code === 'auth/weak-password') {
+            this.error = "Password should be at least 6 characters long."; // Custom error message for weak password
+          } else {
+            this.error = error.message; // Use default error message for other errors
+          }
           console.error('Error creating account:', error.message);
         }
       }

@@ -16,7 +16,7 @@
       <div v-if="error" class="error-message">{{ error }}</div>
       <div class="additional-text">
         <p>Don't have an account?<router-link to="/createaccount" class="signup-link">Sign up here</router-link></p>
-        <p>Forgot password? Reset here</p>
+        <p>Forgot password?<router-link to="/passwordreset" class="reset-link">Reset here</router-link></p>
       </div>
     </div>
   </div>
@@ -52,7 +52,7 @@ export default {
       try {
         // Call the Firebase signInWithEmailAndPassword method to authenticate the user
         const auth = getAuth();
-        await signInWithEmailAndPassword(auth, this.email, this.password)
+        await signInWithEmailAndPassword(auth, this.email, this.password);
         // If authentication is successful, redirect to home
         this.$router.push('/home');
       } catch (error) {
@@ -126,7 +126,7 @@ form{
 .additional-text {
   text-align: center;
 }
-.signup-link {
+.signup-link,.reset-link {
   color: #051E55;
   font-size: 15px;
 }
