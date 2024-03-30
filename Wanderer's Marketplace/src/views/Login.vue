@@ -13,7 +13,7 @@
       <input type="checkbox" id="rememberMe" name="rememberMe">
       <label for="rememberMe"> Remember me</label><br><br>
       <button class="login-button" @click = "login()">Login</button>
-      <div v-if="error" class="error-message">{{ error }}</div>
+      <div v-if="error" class="error-box">{{ error }}</div>
       <div class="additional-text">
         <p>Don't have an account?<router-link to="/createaccount" class="signup-link">Sign up here</router-link></p>
         <p>Forgot password?<router-link to="/passwordreset" class="reset-link">Reset here</router-link></p>
@@ -57,8 +57,18 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         // Handle authentication errors here
-        this.error = error.message;
-        console.error('Error signing in:', error.message);
+        if (error.code === 'auth/invalid-email') {
+          this.error = "Invalid Email Address"; // Custom error message for invalid email
+        } else if (error.code === 'auth/missing-password') {
+          this.error = "Missing Password"; // Custom error message for missing password
+        } else if (error.code === 'auth/wrong-password') {
+          this.error = "Invalid password"; // Custom error message for wrong password
+        } else if (error.code === 'auth/invalid-credential') {
+          this.error = "Invalid Email Address/Password"; // Custom error message for invalid credential
+        } else {
+          this.error = error.message; // Use default error message for other errors
+        }
+        console.error('Error signing in:', error.code, error.message);
       }
     }
   }
@@ -122,7 +132,16 @@ form{
   font-size: 14px;
   width: 300px;
 }
-
+.error-box {
+  background-color: #ffcccc; /* Red background color */
+  border: 1px solid #ff3333; /* Red border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 20px; /* Add some padding */
+  margin-top: 20px; /* Add some space above the error box */
+  width: 260px;
+  font-size: 14px;
+  margin: 20px auto;
+}
 .additional-text {
   text-align: center;
 }
