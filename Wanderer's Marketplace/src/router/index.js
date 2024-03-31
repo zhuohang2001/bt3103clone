@@ -7,6 +7,9 @@ import Marketplace from "@/views/Marketplace.vue";
 import Profile from "@/views/Profile.vue";
 import ListingCompleted from "@/views/ListingCompleted.vue";
 import AddNewListing from "@/views/AddNewListing.vue";
+import ListingDetail from "@/views/ListingDetail.vue";
+import ListingDetailAction from "@/views/ListingDetailAction.vue";
+
 
 const routes = [
 	{
@@ -48,6 +51,16 @@ const routes = [
 		path: "/addnewlisting",
 		name: "AddNewListing",
 		component: AddNewListing,
+	},
+	{
+		path: "/listingdetail",
+		name: "ListingDetail",
+		component: ListingDetail,
+	},
+	{
+		path: "/listingdetailaction",
+		name: "ListingDetailAction",
+		component: ListingDetailAction,
 	},
 ];
 
