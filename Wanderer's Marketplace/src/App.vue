@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<div id="nav" v-if = "user && !isLoginPage && !isCreateAccountPage &&!isPasswordResetPage">
+		<div id="nav" v-if = "user ">
 			<!-- <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /> -->
 			<router-link to="/home"><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /></router-link>
 			<div id="nav-links">
