@@ -16,10 +16,11 @@
         <span v-if="passwordsMatch" class="password-match">Passwords match!</span>
         <span v-else-if="confirmPassword !== '' && confirmPassword !== password" class="password-mismatch">Passwords do not match!</span>
         <br v-if="password !== '' && confirmPassword !== ''"><br> <!-- Render gap only when passwords are filled -->
-        <label for="country">Country</label><br>
+        <!--<label for="country">Country</label><br>
         <select id="country" name="country" class="input-field" v-model="country">
           <option v-for="(countryName, countryCode) in countryNames" :value="countryCode" :key="countryCode">{{ countryName }}</option>
         </select><br><br>
+        -->
         <label for="cardholderName">Cardholder Name</label><br>
         <input type="text" id="cardholderName" name="cardholderName" class="input-field" v-model="cardholderName"><br><br>
         <label for="cardNumber">Card Number</label><br>
@@ -30,7 +31,7 @@
         <input type="month" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate"><br><br>
         <label for="telegramHandle">Telegram Handle</label><br>
         <input type="text" id="telegramHandle" name="telegramHandle" class="input-field" v-model="telegramHandle"><br><br>
-        <button class="createaccount-button" @click="signUp()">Create Account</button>
+        <button class="createaccount-button" @click="signUp($event)">Create Account</button>
         <div class="error-box" v-if="error">
           <div class="error-message">{{ error }}</div>
         </div>
@@ -45,6 +46,10 @@
   import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
   import {countries} from 'countries-list';
   import app from "../firebase.js";
+  import firebaseApp from '../firebase.js';
+  import { getFirestore } from 'firebase/firestore';
+  import { doc, setDoc } from 'firebase/firestore';
+  const db = getFirestore(firebaseApp);
   
   export default {
     name: 'CreateAccount',
@@ -53,7 +58,7 @@
         email: '',
         password: '',
         confirmPassword: '',
-        country: '',
+        //country: '',
         countryNames: [],
         cardholderName: '',
         cardNumber: '',
@@ -70,8 +75,8 @@
       }
     },
     mounted() {
-      this.countryNames = Object.values(countries).map(country => country.name);
-      this.countryNames.sort();
+      //this.countryNames = Object.values(countries).map(country => country.name);
+      //this.countryNames.sort();
       const auth = getAuth();
       onAuthStateChanged(auth, (user) => {
         console.log("Authentication state changed: ", user.email);
@@ -84,15 +89,72 @@
       })  
     },
     methods: {
+      isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      },
       async signUp() {
+        event.preventDefault();
         try {
+          // Check if the username is empty or contains only spaces
+          if (!this.username || this.username.trim() === '') {
+            throw new Error("Please provide a valid username.");
+          }
+          // Check if the email address is valid
+          if (!this.isValidEmail(this.email)) {
+            throw new Error("Invalid email format. Please provide a valid email address.");
+          }
+          // Check if the password is empty or contains only spaces
+          if (!this.password || this.password.trim() === '') {
+            throw new Error("Please provide a valid password.");
+          }
           // Check if the password and confirm password match
           if (this.password !== this.confirmPassword) {
             throw new Error("Passwords do not match!");
           }
+          // Check if the cardholder name is empty or contains only spaces
+          if (!this.cardholderName || this.cardholderName.trim() === '') {
+            throw new Error("Please provide a valid cardholder name.");
+          }
+          // Check if the card number is empty or contains only spaces
+          if (!this.cardNumber || this.cardNumber.trim() === '') {
+            throw new Error("Please provide a valid card number.");
+          }
+          // Check if the card number contains only numbers
+          if (!/^\d+$/.test(this.cardNumber)) {
+            throw new Error("Card number must contain numbers only.");
+          }
+          // Check if the CVV is empty or contains only spaces
+          if (!this.CVV || this.CVV.trim() === '') {
+            throw new Error("Please provide a valid CVV.");
+          }
+          // Check if CVV has exactly three digits
+          if (!/^\d{3}$/.test(this.CVV)) {
+            throw new Error("CVV must be a 3-digit number.");
+          }
+          // Check if the expiry date is filled in
+          if (!this.expiryDate) {
+            throw new Error("Please provide an expiry date.");
+          }
+          // Check if the telegram handle is empty or contains only spaces
+          if (!this.telegramHandle || this.telegramHandle.trim() === '') {
+            throw new Error("Please provide a valid Telegram handle.");
+          }
           // Call the Firebase createUserWithEmailAndPassword method to create a new user
           const auth = getAuth();
-          await createUserWithEmailAndPassword(auth, this.email, this.password);
+          const { user } = await createUserWithEmailAndPassword(auth, this.email, this.password);
+
+          // Save user details to Firestore
+          //const db = app.firestore();
+          await setDoc(doc(db, "Users", user.uid), {
+            username: this.username,
+            email: this.email,
+            cardholderName: this.cardholderName,
+            cardNumber: this.cardNumber,
+            CVV: this.CVV,
+            expiryDate: this.expiryDate,
+            telegramHandle: this.telegramHandle
+          });
           // If account creation is successful, redirect to home or login page
           this.$router.push('/home');
         } catch (error) {
@@ -101,7 +163,10 @@
             this.error = "Invalid email format. Please provide a valid email address."; // Custom error message for invalid email
           } else if (error.code === 'auth/weak-password') {
             this.error = "Password should be at least 6 characters long."; // Custom error message for weak password
-          } else {
+          } else if (error.code === 'auth/email-already-in-use') {
+            this.error = "The email address is already in use. Please use a different email address."; // Custom error message for email already in use
+          } 
+          else {
             this.error = error.message; // Use default error message for other errors
           }
           console.error('Error creating account:', error.message);
