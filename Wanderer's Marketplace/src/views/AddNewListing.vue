@@ -1,16 +1,3 @@
-<script>
-import ProductDetails from '@/components/listing_components/ProductDetails.vue';
-import ProductImage from '@/components/listing_components/ProductImage.vue';
-
-export default {
-  name: 'AddNewListing',
-  components: {
-    ProductDetails,
-    ProductImage
-  }
-}
-</script>
-
 <template>
 	<div>
         <h1>Add Listing</h1>
@@ -21,12 +8,74 @@ export default {
 		</div>
 		<div class="right">
 			<ProductDetails />
-			<button class="add-listing-button">
+			<button class="add-listing-button" type="button" v-on:click="createnewlisting">
 				Add Listing
 			</button>
 		</div>
 	</div>
 </template>
+
+<script>
+import ProductDetails from '@/components/listing_components/ProductDetails.vue';
+import ProductImage from '@/components/listing_components/ProductImage.vue';
+
+import firebaseApp from '../firebase.js';
+import { getFirestore } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+const db = getFirestore(firebaseApp);
+
+export default {
+  name: 'AddNewListing',
+  components: {
+    ProductDetails,
+    ProductImage
+  },
+  methods: {
+    async createnewlisting() {
+        let productName = document.getElementById("productName").value
+        let quantity = document.getElementById("quantity").value
+        let colour = document.getElementById("colour").value
+        let size = document.getElementById("size").value
+        let currency = document.getElementById("currency").value
+        let minProductPrice = document.getElementById("minProductPrice").value
+        let maxProductPrice = document.getElementById("maxProductPrice").value
+        let deliveryFee = document.getElementById("deliveryFee").value
+        let country = document.getElementById("country").value
+        let estimatedDeliveryDate = document.getElementById("estimatedDeliveryDate").value
+
+        alert("Created your listing for : " + productName)
+
+        try{
+            const docRef = await setDoc(doc(db, "Listings", productName), {
+                ListingID: null,
+                UserID: null,
+                ProductImage: null,
+                ProductName: productName,
+                Quantity: quantity,
+                Colour: colour,
+                Size: size,
+                Currency: currency,
+                MinProductPrice: minProductPrice,
+                MaxProductPrice: maxProductPrice,
+                DeliveryFee: deliveryFee,
+                Country: country,
+                EstimatedDeliveryDate: estimatedDeliveryDate,
+                ListingStatus: "available",
+                DateCreation: null,
+                TimeCreation: null,
+            })
+            console.log(docRef)
+            document.getElementById('myform').reset();
+            this.$emit("added")
+            }
+            catch(error) {
+                console.error("Error adding document: ", error);
+        }
+    }
+  }
+}
+
+</script>
 
 <style>
     h1 {
