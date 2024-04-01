@@ -19,6 +19,7 @@
 import ProductDetails from '@/components/listing_components/ProductDetails.vue';
 import ProductImage from '@/components/listing_components/ProductImage.vue';
 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import firebaseApp from '../firebase.js';
 import { getFirestore } from 'firebase/firestore';
 import { doc, setDoc } from 'firebase/firestore';
@@ -29,6 +30,28 @@ export default {
   components: {
     ProductDetails,
     ProductImage
+  },
+  data() {
+    return {
+      email: '',
+      password: '',
+      error: '',
+      user: null,
+      userUID: null,
+    };
+  },
+  mounted() {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      console.log("Authentication state changed: ", user.email);
+      if (user) {
+        this.user = user;
+        console.log('User is logged in');
+        this.userUID = user.uid;
+      } else {
+        console.log("User is not logged in.")
+      }
+    })  
   },
   methods: {
     async createnewlisting() {
@@ -43,12 +66,17 @@ export default {
         let country = document.getElementById("country").value
         let estimatedDeliveryDate = document.getElementById("estimatedDeliveryDate").value
 
-        alert("Created your listing for : " + productName)
+        let currentDate = new Date();
+        let dateCreation = currentDate.toISOString().split('T')[0];
+        let timeCreation = currentDate.toTimeString().split(' ')[0];
+        let listingID = this.userUID + '-' + dateCreation + '-' + timeCreation;
+
+        alert("Created your listing for: " + productName)
 
         try{
-            const docRef = await setDoc(doc(db, "Listings", productName), {
-                ListingID: null,
-                UserID: null,
+            const docRef = await setDoc(doc(db, "Listings", listingID), {
+                ListingID: listingID,
+                UserID: this.userUID,
                 ProductImage: null,
                 ProductName: productName,
                 Quantity: quantity,
@@ -61,12 +89,14 @@ export default {
                 Country: country,
                 EstimatedDeliveryDate: estimatedDeliveryDate,
                 ListingStatus: "available",
-                DateCreation: null,
-                TimeCreation: null,
+                DateCreation: dateCreation,
+                TimeCreation: timeCreation,
             })
             console.log(docRef)
             document.getElementById('myform').reset();
             this.$emit("added")
+
+            this.$router.push('/home');
             }
             catch(error) {
                 console.error("Error adding document: ", error);
@@ -89,7 +119,8 @@ export default {
         justify-content: center;
         align-items: stretch;
         height: calc(100vh - 80px);
-        padding: 50px;
+        padding-left: 50px;
+        padding-top: 10px;
         gap: 25px;
     }
 
