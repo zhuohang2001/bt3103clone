@@ -21,6 +21,7 @@
     },
     methods: {
       handleFiltersApplied(filters) {
+        console.log("Filters applied:", filters);
         this.activeFilters = filters;
       }
     }

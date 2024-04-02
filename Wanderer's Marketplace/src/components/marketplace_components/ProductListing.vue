@@ -10,7 +10,12 @@
   
   <script>
   import ProductCard from './ProductCard.vue';
-  
+  import firebaseApp from '@/firebase.js';
+  import { getFirestore } from 'firebase/firestore';
+  import app from "@/firebase.js";
+  const db = getFirestore(firebaseApp);
+  import { collection, query, where, getDocs } from 'firebase/firestore';
+
   export default {
     props: {
     filters: {
@@ -40,40 +45,34 @@
     methods: {
     async fetchProducts(filters) {
       try {
-        let query = db.collection('listings');
-
-        // Apply category filter
-      if (filters.category) {
-        query = query.where('Category', '==', filters.category);
-      }
-
-      // Apply search filter for product name
-      if (filters.search) {
-        query = query.where('ProductName', '>=', filters.search)
-                     .where('ProductName', '<=', filters.search + '\uf8ff');
-      }
-
-      // Apply country filter
-      if (filters.country) {
-        query = query.where('Country', '==', filters.country);
-      }
-
-      // Apply max product price filter
-      if (filters.maxPrice !== null) {
-        query = query.where('MaxProductPrice', '<=', filters.maxPrice);
-      }
-
-      // Apply delivery fee range filter
-      if (filters.minDeliveryFee !== null && filters.maxDeliveryFee !== null) {
-        query = query.where('DeliveryFee', '>=', filters.minDeliveryFee)
-                     .where('DeliveryFee', '<=', filters.maxDeliveryFee);
-      }
-
-        const querySnapshot = await query.get();
+        // const { search, category, country, maxPrice, minDeliveryFee, maxDeliveryFee, sort } = filters;
+        console.log("filters")
+        console.log(filters)
+        let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'available'));
+        if (filters) {
+            if (filters.category) {
+            q = query(q, where('Category', '==', filters.category));
+            }
+            if (filters.search) {
+              q = query(q, where('ProductName', '>=', filters.search), where('ProductName', '<=', filters.search + '\uf8ff'));
+            }
+            if (filters.country) {
+              q = query(q, where('Country', '==', filters.country));
+            }
+            if (filters.maxPrice !== null) {
+              q = query(q, where('MaxProductPrice', '<=', filters.maxPrice));
+            }
+            if (filters.minDeliveryFee !== null && filters.maxDeliveryFee !== null) {
+              q = query(q, where('DeliveryFee', '>=', filters.minDeliveryFee), where('DeliveryFee', '<=', filters.maxDeliveryFee));
+            }
+        }
+        const querySnapshot = await getDocs(q);
         this.products = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+        console.log(this.products)
+        console.log("showing products")
       } catch (error) {
         console.error("Error getting documents: ", error);
       }
