@@ -1,24 +1,28 @@
 <template>
-    <div class="product-card">
-      <img :src="product.imageUrl" alt="Product image">
-      <h2>{{ product.name }}</h2>
-      <p>{{ product.price }}</p>
-      <!-- Other product details -->
+  <div class="product-card">
+    <img :src="product.imageUrl" alt="Product image" class="product-image">
+    <div class="product-info">
+      <h3 class="product-name">{{ product.name }}</h3>
+      <p class="product-price">$ {{ product.price }}</p>
+      <!-- Added location and date information -->
+      <p class="product-location-date">{{ product.country }} | {{ product.date }}</p>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      product: Object,
-    },
-  };
-  </script>
-  
-  <style scoped>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    product: Object,
+  },
+};
+</script>
+
+<style scoped>
 .product-card {
   display: flex;
   flex-direction: column;
+  min-height: 150px;
   border: 1px solid #e1e1e1;
   border-radius: 8px;
   overflow: hidden;
@@ -34,8 +38,8 @@
 
 .product-image {
   width: 100%;
-  object-fit: cover; /* This makes sure that the image covers the area without stretching. */
-  aspect-ratio: 1 / 1; /* Adjust the aspect ratio as needed */
+  object-fit: cover;
+  height: 200px;
 }
 
 .product-info {
@@ -50,8 +54,13 @@
 }
 
 .product-price {
-  font-size: 1.2rem;
-  color: #666;
-  font-weight: bold;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* New styles for location and date */
+.product-location-date {
+  font-size: 0.8rem;
+  color: #888;
 }
 </style>

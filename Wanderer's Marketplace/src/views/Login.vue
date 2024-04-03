@@ -41,6 +41,7 @@ export default {
       console.log("Authentication state changed: ", user.email);
       if (user) {
         this.user = user;
+        this.$store.dispatch('fetchUser', user);
         console.log('User is logged in');
       } else {
         console.log("User is not logged in.")
