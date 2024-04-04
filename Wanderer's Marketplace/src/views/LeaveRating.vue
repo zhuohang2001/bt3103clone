@@ -14,7 +14,7 @@
 		<input
 			type="text"
 			id="comment"
-			v-model="comment"
+			v-model="ratingComment"
 			placeholder="Leave a comment (optional)"
 		/>
 		<button id="submit" type="button" v-on:click="leaveRating">Submit</button>
@@ -24,15 +24,15 @@
 <script>
 import firebaseApp from "../firebase.js";
 import { getFirestore } from "firebase/firestore";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 const db = getFirestore(firebaseApp);
 
 export default {
 	name: "LeaveRating",
 	data() {
 		return {
-			ratedUsername: "Username", //kiv
-			ratedByUsername: "OtherUser", //kiv
+			ratedUsername: "John Doe", //kiv
+			ratedByUsername: "Betty", //kiv
 			selectedRating: 0,
 			ratingComment: "",
 		};
@@ -53,18 +53,16 @@ export default {
 			});
 		},
 		async leaveRating() {
-			alert("Saving your rating: " + ratingID);
 			try {
-				const docRef = await setDoc(doc(db, "Ratings", ratingID), {
-					RatingID: "1",
+				const docRef = await addDoc(collection(db, "Ratings"), {
 					RatedUsername: this.ratedUsername,
 					RatedByUsername: this.ratedByUsername,
 					RatingValue: this.selectedRating,
 					RatingComment: this.ratingComment,
 				});
-				console.log(docRef);
+				console.log("Document written with ID: ", docRef.id);
 				this.selectedRating = 0;
-				this.comment = "";
+				this.ratingComment = "";
 				this.$emit("added");
 				this.$router.push("/home");
 			} catch (error) {
