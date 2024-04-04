@@ -49,6 +49,13 @@
         console.log("filters")
         console.log(filters)
         let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'available'));
+        // console.log(this.$store.state.user)
+        //   if (this.$store.state.user) {
+        //     console.log('hi')
+        //     console.log(this.$store.state.user.uid)
+        //     const user_uid = this.$store.state.user.uid
+        //     q = query(q, where('UserID', '!=', user_uid));
+        //   }
         if (filters) {
             if (filters.category) {
             q = query(q, where('Category', '==', filters.category));
@@ -67,10 +74,18 @@
             }
         }
         const querySnapshot = await getDocs(q);
-        this.products = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        this.products = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.ProductName, // Make sure 'ProductName' matches the field in Firestore
+            price: data.MaxProductPrice, // Same here for 'MaxProductPrice'
+            date: data.DateCreation, // And for 'DateCreation'
+            country: data.Country, // And for 'Country'
+            imageUrl: data.ProductImage // Ensure there is an image URL in the data
+            // Add other product details you want to display...
+          };
+        })
         console.log(this.products)
         console.log("showing products")
       } catch (error) {
@@ -81,3 +96,20 @@
   };
   </script>
   
+  <style scoped>
+
+  .product-listing {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(200px, 1fr)); /* This will create three columns of equal width */
+    grid-gap: 26px; /* This will create space between your cards */
+    padding: 26px;
+    /* Add responsive behavior if necessary */
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(2, 1fr); /* Two columns for smaller screens */
+    }
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr; /* One column for even smaller screens */
+    }
+  }
+
+  </style>
