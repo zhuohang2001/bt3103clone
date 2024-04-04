@@ -48,7 +48,7 @@
         // const { search, category, country, maxPrice, minDeliveryFee, maxDeliveryFee, sort } = filters;
         console.log("filters")
         console.log(filters)
-        let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'available'));
+        let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'Available'));
         // console.log(this.$store.state.user)
         //   if (this.$store.state.user) {
         //     console.log('hi')
