@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import CreateAccount from "@/views/CreateAccount.vue";
-import PasswordReset from "@/views/PasswordReset.vue"
+import PasswordReset from "@/views/PasswordReset.vue";
 import Home from "@/views/Home.vue";
 import Marketplace from "@/views/Marketplace.vue";
 import Profile from "@/views/Profile.vue";
@@ -9,7 +9,7 @@ import ListingCompleted from "@/views/ListingCompleted.vue";
 import AddNewListing from "@/views/AddNewListing.vue";
 import ListingDetail from "@/views/ListingDetail.vue";
 import ListingDetailAction from "@/views/ListingDetailAction.vue";
-
+import LeaveRating from "@/views/LeaveRating.vue";
 
 const routes = [
 	{
@@ -17,16 +17,16 @@ const routes = [
 		name: "Login",
 		component: Login,
 	},
-    {
-        path: "/createaccount",
-        name: "CreateAccount",
-        component: CreateAccount,
-    },
-    {
-        path: "/passwordreset",
-        name: "PasswordReset",
-        component: PasswordReset,
-    },
+	{
+		path: "/createaccount",
+		name: "CreateAccount",
+		component: CreateAccount,
+	},
+	{
+		path: "/passwordreset",
+		name: "PasswordReset",
+		component: PasswordReset,
+	},
 	{
 		path: "/home",
 		name: "Home",
@@ -61,6 +61,11 @@ const routes = [
 		path: "/listingdetailaction",
 		name: "ListingDetailAction",
 		component: ListingDetailAction,
+	},
+	{
+		path: "/leaverating",
+		name: "LeaveRating",
+		component: LeaveRating,
 	},
 ];
 
