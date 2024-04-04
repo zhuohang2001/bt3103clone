@@ -1,6 +1,11 @@
 <script>
+import HomeListings from '@/components/home_components/HomeListings.vue';
+
 export default {
-  name: 'Home'
+  name: 'Home',
+  components: {
+    HomeListings
+  },
 }
 </script>
 
@@ -12,7 +17,7 @@ export default {
     </div>
     
     <div id="SecondDiv" class="scroll">
-      <h1>Listings hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</h1>
+      <HomeListings />
     </div>
     
     <div id="ThirdDiv">
@@ -33,6 +38,7 @@ export default {
   
   #YourPurchases, #GoodsYouAreHelpingToBuy {
     color: white;
+    margin-bottom: 18px;
   }
 
   #FirstDiv, #ThirdDiv {

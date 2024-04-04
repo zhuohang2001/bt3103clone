@@ -88,7 +88,7 @@ export default {
                 DeliveryFee: deliveryFee,
                 Country: country,
                 EstimatedDeliveryDate: estimatedDeliveryDate,
-                ListingStatus: "available",
+                ListingStatus: "Available",
                 DateCreation: dateCreation,
                 TimeCreation: timeCreation,
             })
