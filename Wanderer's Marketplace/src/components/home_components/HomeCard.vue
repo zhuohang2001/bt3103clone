@@ -1,5 +1,5 @@
 <template>
-    <div class="product-card">
+    <div class="product-card" @click = "getListingDetails">
       <img :src="product.imageUrl" alt="Product image" class="product-image">
       <div class="product-info">
         <h3 class="product-name">{{ product.name }}</h3>
@@ -15,15 +15,21 @@
     },
     computed: {
         statusClass() {
-        return {
+          return {
             'product-status': true, // Always apply this class
             'status-available': this.product.status === 'Available', // Apply this class if status is 'available'
             'status-accepted': this.product.status === 'Accepted', // Apply this class if status is 'accepted'
             'status-purchased': this.product.status === 'Purchased', // Apply this class if status is 'purchased'
             'status-completed': this.product.status === 'Completed', // Apply this class if status is 'completed'
-        };
+          };
         },
     },
+    methods: {
+      getListingDetails() {
+        this.$emit('card-click', this.product); // Emit a custom event with the product data
+			this.$router.push({ name: 'AvailableListingShopper' });
+      },
+    }
     };
 </script>
 

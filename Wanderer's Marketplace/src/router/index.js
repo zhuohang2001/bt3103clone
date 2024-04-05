@@ -10,6 +10,7 @@ import AddNewListing from "@/views/AddNewListing.vue";
 import ListingDetail from "@/views/ListingDetail.vue";
 import ListingDetailAction from "@/views/ListingDetailAction.vue";
 import LeaveRating from "@/views/LeaveRating.vue";
+import AvailableListingShopper from "@/views/AvailableListingShopper.vue";
 
 const routes = [
 	{
@@ -67,6 +68,12 @@ const routes = [
 		name: "LeaveRating",
 		component: LeaveRating,
 	},
+	{
+		path: "/availablelistingshopper",
+		name: "AvailableListingShopper",
+		component: AvailableListingShopper,
+	}
+   
 ];
 
 const router = createRouter({
