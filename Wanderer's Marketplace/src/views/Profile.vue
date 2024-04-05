@@ -3,7 +3,7 @@
 		<div id="FirstDiv">
 			<h1 id="Username">username to be displayed here</h1>
 			<button class="signout-button" type="button" v-on:click="signOut">
-				Sign Out
+				Logout
 			</button>
 		</div>
 		<div id="SecondDiv" class="scroll">to show ratings</div>
