@@ -34,9 +34,6 @@ export default {
     };
   },
   created() {
-    this.fetchProducts();
-  },
-  created() {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       console.log("Authentication state changed: ", user.email);
