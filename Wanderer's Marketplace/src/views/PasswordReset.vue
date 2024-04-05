@@ -6,8 +6,10 @@
       <div class="login-form">
         <h2>Password Reset</h2>
         <p class = "grey-text">Enter your email address to reset your password</p>
-        <label for="email">Email Address </label><br>
-        <input type="email" id="email" name="email" class = "input-field" v-model="email"><br><br>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="input-field" v-model="email">
+        </div><br>
         <button class="login-button" @click = "resetPassword()">Reset Password</button>
         <div v-if="error" class="error-message">{{ error }}</div>
         <div class="additional-text">

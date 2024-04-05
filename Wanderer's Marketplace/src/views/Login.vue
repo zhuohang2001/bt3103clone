@@ -5,7 +5,9 @@
     </div>
     <div class="login-form">
       <h2>Account Login</h2>
-      <h5 class = "grey-text">If you are already a member, please login <br> with your email address and password.</h5>
+      <div class = "form-group">
+        <p class = "grey-text">If you are already a member, please login with<br>your email address and password.</p>
+      </div>
       <div class="form-group">
         <label for="email">Email Address</label>
         <input type="email" id="email" name="email" class="input-field" v-model="email">
