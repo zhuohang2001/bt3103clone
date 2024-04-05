@@ -9,7 +9,7 @@
 				<router-link to="/profile"> Profile </router-link>
 			</div>
 		</div>
-		<div id="content">
+		<div id="content" :style="{ paddingTop: user ? '100px' : '0' }">
 			<router-view />
 		</div>
 	</div>
@@ -68,7 +68,7 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	color: #2c3e50;
-	margin-top: 10px;
+	margin-top: 0px;
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -106,7 +106,7 @@ export default {
 
 #content {
 	flex: 1;
-	padding-top: 80px;
+	padding-top: 100px;
 }
 
 body {

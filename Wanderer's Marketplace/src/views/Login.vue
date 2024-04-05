@@ -5,13 +5,21 @@
     </div>
     <div class="login-form">
       <h2>Account Login</h2>
-      <h5 class = "grey-text">If you are already a member, please login <br> with your email adddress and password.</h5>
-      <label for="email">Email Address </label><br>
-      <input type="email" id="email" name="email" class = "input-field" v-model="email"><br><br>
-      <label for="password">Password </label><br>
-      <input type="password" id="password" name="password" class = "input-field" v-model="password"><br><br>
-      <input type="checkbox" id="rememberMe" name="rememberMe">
-      <label for="rememberMe"> Remember me</label><br><br>
+      <h5 class = "grey-text">If you are already a member, please login <br> with your email address and password.</h5>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="input-field" v-model="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="input-field" v-model="password">
+      </div>
+      <div class="form-group">
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <label for="rememberMe"> Remember me</label>
+        </div>
+      </div>
       <button class="login-button" @click = "login()">Login</button>
       <div v-if="error" class="error-box">{{ error }}</div>
       <div class="additional-text">
@@ -85,43 +93,74 @@ export default {
 }
 
 .login-logo {
-  width: 50%;
+  flex: 60%;
+  max-width: 60%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
 }
 
 .login-logo img {
-  width: 70%; /* Make sure image fills its container */
+  max-width: 60%; /* Make sure image fills its container */
   height: auto; /* Maintain aspect ratio */
 }
 
 .login-form {
-  flex: 1; /* Take up remaining space */
-  position: relative;
-  text-align: center;
-  width: 300px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Align items vertically at the center */
+  align-items: center; /* Align items horizontally at the center */
 }
 
 .login-form::before {
   content: '';
-  position: absolute;
-  top: -20px;
-  bottom: -30px;
-  left: calc( 7%); /* Adjust the position of the line */
+  position: absolute; 
+  top: 10px;
+  bottom: auto;
+  left: 0%;
+  margin-left: -7%; /* Adjusted position of the line */
   width: 2px; /* Width of the line */
   background-color: #051E55; /* Color of the line */
+  height: 100%;
 }
+
 .grey-text{
   color: #717171;
 }
 
-form{
+/*form{
   text-align: center;
   align-items: center;
   margin: auto;
 }
+*/
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+}
 .input-field {
   width: 300px; /* Adjust the width of the input fields */
   box-sizing: border-box;
+  margin: 0 auto;
 }
+.remember-me {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  flex-direction: row;
+}
+
 
 .login-button {
   padding: 10px 20px;
@@ -149,5 +188,7 @@ form{
 .signup-link,.reset-link {
   color: #051E55;
   font-size: 15px;
+  font-weight: bold;
 }
+
 </style>

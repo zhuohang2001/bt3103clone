@@ -1,46 +1,58 @@
 <template>
-    <div class="container">
-      <div class="login-logo">
-        <img src="/images/logo_with_words.png" alt="Logo">
+  <div class="container">
+    <div class="login-logo">
+      <img src="/images/logo_with_words.png" alt="Logo">
+    </div>
+    <div class="signup-form">
+      <h2>Create Your Account</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" class="input-field" v-model="username">
       </div>
-      <div class="signup-form">
-        <h2>Create Your Account</h2>
-        <label for="username">Username</label><br>
-        <input type="text" id="username" name="username" class="input-field" v-model="username"><br><br>
-        <label for="email">Email Address</label><br>
-        <input type="email" id="email" name="email" class="input-field" v-model="email"><br><br>
-        <label for="password">Password</label><br>
-        <input type="password" id="password" name="password" class="input-field" v-model="password"><br><br>
-        <label for="confirmPassword">Confirm Password</label><br>
-        <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" v-model="confirmPassword"><br><br>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="input-field" v-model="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="input-field" v-model="password">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" v-model="confirmPassword">
         <span v-if="passwordsMatch" class="password-match">Passwords match!</span>
         <span v-else-if="confirmPassword !== '' && confirmPassword !== password" class="password-mismatch">Passwords do not match!</span>
-        <br v-if="password !== '' && confirmPassword !== ''"><br> <!-- Render gap only when passwords are filled -->
-        <!--<label for="country">Country</label><br>
-        <select id="country" name="country" class="input-field" v-model="country">
-          <option v-for="(countryName, countryCode) in countryNames" :value="countryCode" :key="countryCode">{{ countryName }}</option>
-        </select><br><br>
-        -->
-        <label for="cardholderName">Cardholder Name</label><br>
-        <input type="text" id="cardholderName" name="cardholderName" class="input-field" v-model="cardholderName"><br><br>
-        <label for="cardNumber">Card Number</label><br>
-        <input type="text" id="cardNumber" name="cardNumber" class="input-field" v-model="cardNumber"><br><br>
-        <label for="CVV">CVV</label><br>
-        <input type="text" id="CVV" name="CVV" class="input-field" v-model="CVV"><br><br>
-        <label for="expiryDate">Expiry Date</label><br>
-        <input type="month" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate"><br><br>
-        <label for="telegramHandle">Telegram Handle</label><br>
-        <input type="text" id="telegramHandle" name="telegramHandle" class="input-field" v-model="telegramHandle"><br><br>
-        <button class="createaccount-button" @click="signUp($event)">Create Account</button>
-        <div class="error-box" v-if="error">
-          <div class="error-message">{{ error }}</div>
-        </div>
-        <div class="additional-text">
-          <p>Already have an account?<router-link to="/" class="login-link" >Login here</router-link></p>
-        </div>
+      </div>
+      <div class="form-group">
+        <label for="cardholderName">Cardholder Name</label>
+        <input type="text" id="cardholderName" name="cardholderName" class="input-field" v-model="cardholderName">
+      </div>
+      <div class="form-group">
+        <label for="cardNumber">Card Number</label>
+        <input type="text" id="cardNumber" name="cardNumber" class="input-field" v-model="cardNumber">
+      </div>
+      <div class="form-group">
+        <label for="CVV">CVV</label>
+        <input type="text" id="CVV" name="CVV" class="input-field" v-model="CVV">
+      </div>
+      <div class="form-group">
+        <label for="expiryDate">Expiry Date</label>
+        <input type="month" id="expiryDate" name="expiryDate" class="input-field" v-model="expiryDate">
+      </div>
+      <div class="form-group">
+        <label for="telegramHandle">Telegram Handle</label>
+        <input type="text" id="telegramHandle" name="telegramHandle" class="input-field" v-model="telegramHandle">
+      </div>
+      <button class="createaccount-button" @click="signUp($event)">Create Account</button>
+      <div class="error-box" v-if="error">
+        <div class="error-message">{{ error }}</div>
+      </div>
+      <div class="additional-text">
+        <p>Already have an account?<router-link to="/" class="login-link" >Login here</router-link></p>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
@@ -196,23 +208,41 @@
   .signup-form {
     flex: 1; /* Take up remaining space */
     position: relative;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
     width: 300px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
   }
   
   .signup-form::before {
     content: '';
-    position: absolute;
-    top: -20px;
-    bottom: -30px;
-    left: calc( 7%); /* Adjust the position of the line */
+    position: absolute; 
+    top: 0px;
+    bottom: 0px; /* Extend the line to the bottom of the container */
+    left: 0%; /* Position the line at the center horizontally */
     width: 2px; /* Width of the line */
     background-color: #051E55; /* Color of the line */
   }
+  /*
   form {
     text-align: center;
     align-items: center;
     margin: auto;
+  }
+  */
+  .form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+  .form-group label {
+    margin-bottom: 5px;
   }
   
   .input-field {
@@ -252,6 +282,7 @@
   .login-link {
     font-size: 15px;
     color:#051E55;
+    font-weight: bold;
   }
   </style>
   
