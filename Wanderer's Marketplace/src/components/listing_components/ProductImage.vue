@@ -34,14 +34,14 @@ export default {
 }
 
 .image-container {
-	width: 80%;
+	width: 100%;
 	height: auto;
 	border-radius: 10px;
 	overflow: hidden;
 }
 
 .image-container img {
-	width: 100%;
+	width: 50%;
 	height: auto;
 	border-radius: 10px;
 }

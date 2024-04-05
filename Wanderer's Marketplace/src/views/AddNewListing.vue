@@ -4,7 +4,7 @@
 	</div>
 	<div class="product-details-container">
 		<div class="left">
-			<ProductImage />
+			<UploadProductImage :imageSrc="imageSrc" @update:imageSrc="updateImageSrc" />
 		</div>
 		<div class="right">
 			<ProductDetails />
@@ -21,7 +21,7 @@
 
 <script>
 import ProductDetails from "@/components/listing_components/ProductDetails.vue";
-import ProductImage from "@/components/listing_components/ProductImage.vue";
+import UploadProductImage from "@/components/listing_components/UploadProductImage.vue";
 
 import {
 	getAuth,
@@ -37,7 +37,7 @@ export default {
 	name: "AddNewListing",
 	components: {
 		ProductDetails,
-		ProductImage,
+		UploadProductImage,
 	},
 	data() {
 		return {
@@ -46,6 +46,7 @@ export default {
 			error: "",
 			user: null,
 			userUID: null,
+			imageSrc: "",
 		};
 	},
 	mounted() {
@@ -62,6 +63,9 @@ export default {
 		});
 	},
 	methods: {
+		updateImageSrc(src) {
+			this.imageSrc = src; // Update image source
+		},
 		async createnewlisting() {
 			let productName = document.getElementById("productName").value;
 			let quantity = document.getElementById("quantity").value;
@@ -72,9 +76,7 @@ export default {
 			let maxProductPrice = document.getElementById("maxProductPrice").value;
 			let deliveryFee = document.getElementById("deliveryFee").value;
 			let country = document.getElementById("country").value;
-			let estimatedDeliveryDate = document.getElementById(
-				"estimatedDeliveryDate"
-			).value;
+			let estimatedDeliveryDate = document.getElementById("estimatedDeliveryDate").value;
 
 			let currentDate = new Date();
 			let dateCreation = currentDate.toISOString().split("T")[0];
