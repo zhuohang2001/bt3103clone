@@ -6,7 +6,7 @@
           This offer includes the product price and delivery fee.
         </p>
         <div class="offer-input-wrapper">
-          <input type="number" v-model.number="offer" class="offer-input" placeholder="$0" min="0" />
+          <input type="number" v-model.number="offer_amt" class="offer-input" placeholder="$0" min="0" />
           <button @click="submitOffer" class="submit-offer-button">Submit</button>
         </div>
       </div>
@@ -14,20 +14,53 @@
   </template>
   
   <script>
+  import firebaseApp from "../../firebase.js";
+  import { getFirestore } from "firebase/firestore";
+  import { doc, setDoc } from "firebase/firestore";
+  const db = getFirestore(firebaseApp);
+
   export default {
     name: "InputListingOffer",
     data() {
       return {
-        offer: 130, // Default value to match the image
+        offer_amt: 130, // Default value to match the image
       };
     },
     methods: {
-      submitOffer() {
-        // Submit the offer
-        console.log('Offer submitted:', this.offer);
-        // Here you would handle the offer submission (e.g., API call)
-        this.$emit('offerSubmitted', this.offer);
-      },
+      async submitOffer() {
+        const user_uid = this.$store.state.user.uid
+        const listing_uid = this.$store.state.currentListing.id
+
+        const offerObject = {
+        OfferID: this.generateOfferID(user_uid, listing_uid), // Assuming you have a method to generate a unique OfferID
+        ListingID: listing_uid,
+        OfferByUserID: user_uid,
+        OfferPrice: this.offer_amt,
+        OfferStatus: "Pending", // Default status when an offer is first created
+      };
+      console.log("offerObj", offerObject)
+
+      try {
+        // Use Firestore addDoc to add the offerObject to the "offers" collection
+        await setDoc(doc(db, "Offers", offerObject.OfferID), offerObject);
+        console.log('Offer submitted:', offerObject);
+
+        // Emit an event in case the parent component needs to react to the offer submission
+        this.$emit('offerSubmitted', offerObject);
+
+        // Redirect back to the marketplace page using Vue Router
+        this.$router.push({ name: 'Marketplace' }); // Ensure you have a route named 'Marketplace'
+      } catch (error) {
+        console.error('Error submitting offer:', error);
+        // Handle any errors here, such as displaying a message to the user
+      }
+    },
+    generateOfferID(user_uid, listing_uid) {
+      let currentDate = new Date();
+			let dateCreation = currentDate.toISOString().split("T")[0];
+			let timeCreation = currentDate.toTimeString().split(" ")[0];
+			return user_uid + "-" + listing_uid + "-" + dateCreation + "-" + timeCreation;
+    },
     },
   };
   </script>
