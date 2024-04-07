@@ -4,6 +4,7 @@
       v-for="product in products"
       :key="product.id"
       :product="product"
+      @cardClick = "handleCardClick"
     />
   </div>
 </template>
@@ -16,6 +17,7 @@ import app from "@/firebase.js";
 const db = getFirestore(firebaseApp);
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {mapActions} from 'vuex';
 
 export default {
   props: {
@@ -47,6 +49,13 @@ export default {
     });
   },
   methods: {
+    ...mapActions(['setCurrentListing']),
+    handleCardClick(product) {
+      this.setCurrentListing(product);
+      // Optionally redirect to the product's detail view
+      this.$router.push({ name: 'ListingDetail', params: { productId: product.id } });
+      console.log("product", product)
+    },
     async fetchProducts() {
       try {
         let q = query(
@@ -59,9 +68,22 @@ export default {
           const data = doc.data();
           return {
             id: doc.id,
-            name: data.ProductName,
-            status: data.ListingStatus,
-            imageUrl: data.ProductImage
+            name: data.ProductName, // Make sure 'ProductName' matches the field in Firestore
+            maxPrice: data.MaxProductPrice, // Same here for 'MaxProductPrice'
+            date: data.DateCreation, // And for 'DateCreation'
+            country: data.Country, // And for 'Country'
+            imageUrl: data.ProductImage, // Ensure there is an image URL in the data
+
+            color: data.Colour,
+            currency: data.Currency,
+            deliveryFee: data.DeliveryFee,
+            deliveryDate: data.EstimatedDeliveryDate,
+            minPrice: data.MinProductPrice,
+            listingStatus: data.ListingStatus,
+            quantity: data.Quantity,
+            size: data.Size,
+            timeCreation: data.timeCreation, 
+            userID: data.userID
           };
         });
         console.log(this.products)

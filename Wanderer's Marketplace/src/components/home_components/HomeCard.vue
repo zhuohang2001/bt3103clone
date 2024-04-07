@@ -1,5 +1,5 @@
 <template>
-    <div class="product-card" @click = "getListingDetails">
+    <div class="product-card" @click = "cardClicked">
       <img :src="product.imageUrl" alt="Product image" class="product-image">
       <div class="product-info">
         <h3 class="product-name">{{ product.name }}</h3>
@@ -25,12 +25,18 @@
         },
     },
     methods: {
-      getListingDetails() {
-        this.$emit('card-click', this.product); // Emit a custom event with the product data
-			this.$router.push({ name: 'AvailableListingShopper' });
+      cardClicked() {
+        this.$emit('cardClick', this.product); // Emit a custom event with the product data
+			//this.$router.push({ name: 'AvailableListingShopper' });
       },
+      formatDate(date) {
+        if (!date) return '';
+        // Assuming date is a Firestore Timestamp and converting to JavaScript Date
+        const jsDate = new Date(date.seconds * 1000);
+        return jsDate.toLocaleDateString("en-US"); // Format the date as you need
+      }
     }
-    };
+  };
 </script>
 
 <style scoped>
