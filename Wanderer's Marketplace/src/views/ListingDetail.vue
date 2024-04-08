@@ -4,7 +4,7 @@
 				<ProductImage />
 			</div>
 			<div class="right">
-				<ProductDetails />
+				<ProductDetailsViewing :product-details="productDetails" />
 				<button class="action-button" @click="buttonConfig.action">
 					{{ buttonConfig.label }}
 				</button>
@@ -14,13 +14,13 @@
 
 	<script>
 	import ProductImage from "../components/listing_components/ProductImage.vue";
-	import ProductDetails from "../components/listing_components/ProductDetails.vue";
+	import ProductDetailsViewing from "../components/listing_components/ProductDetailsViewing.vue";
 	import { mapState } from 'vuex';
 
 
 	export default {
 		name: "ListingDetail",
-		components: { ProductImage, ProductDetails },
+		components: { ProductImage, ProductDetailsViewing },
 		data() {
 			// return {
 			// 	productDetails: {
