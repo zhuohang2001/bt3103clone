@@ -7,7 +7,28 @@
 			</button>
 		</div>
 		<div id="SecondDiv">
-			<div id="details">details here</div>
+			<div id="details">
+				<img :src="profilePhoto" alt="Profile Photo" id="profile-photo" />
+				<div id="user-info">
+					<div id="user-joined">Joined {{ dateJoined }}</div>
+					<div id="user-telegram">Telegram @{{ telegramHandle }}</div>
+				</div>
+				<div id="user-rating">
+					<div id="overall-rating">
+						{{ averageRating.toFixed(1) }} ({{ numberOfRatings }} ratings)
+					</div>
+					<div class="stars">
+						<!-- include method to return the correct number of filled stars based on the rating -->
+						<span
+							class="star"
+							v-for="i in 5"
+							:key="i"
+							:class="{ filled: i <= averageRating }"
+							>&#9733;</span
+						>
+					</div>
+				</div>
+			</div>
 			<div id="ratings" class="scroll">
 				<div v-for="(rating, index) in ratings" :key="index">
 					<Rating
@@ -59,12 +80,37 @@ export default {
 	components: { Rating },
 	data() {
 		return {
-			profilePhoto: "path/to/profile/photo.jpg",
-			ratings: [], // Array to store fetched ratings
 			username: "",
+			ratings: [],
+			profilePhoto: "/images/logo_with_words.png",
+			dateJoined: "",
+			telegramHandle: "",
+			averageRating: 0,
+			numberOfRatings: 0,
 		};
 	},
 	methods: {
+		async fetchUserData() {
+			const user = this.$root.user;
+			if (user) {
+				const db = getFirestore();
+				const userDocRef = doc(db, "Users", user.uid);
+				const userDocSnapshot = await getDoc(userDocRef);
+				if (userDocSnapshot.exists()) {
+					const userData = userDocSnapshot.data();
+					this.username = userData.username;
+					this.telegramHandle = userData.telegramHandle;
+				} else {
+					console.error("User document does not exist for:", user.uid);
+				}
+				this.dateJoined = new Date(
+					user.metadata.creationTime
+				).toLocaleDateString("en-GB");
+				await this.fetchRatings();
+			} else {
+				console.log("No user found");
+			}
+		},
 		async fetchRatings() {
 			try {
 				const db = getFirestore();
@@ -72,9 +118,18 @@ export default {
 				const userRatingsQuery = query(
 					ratingsRef,
 					where("RatedUsername", "==", this.username)
-				); // kiv, Change to the username of the current user
+				);
 				const querySnapshot = await getDocs(userRatingsQuery);
-				this.ratings = querySnapshot.docs.map((doc) => doc.data());
+				let totalRatings = 0;
+				this.ratings = querySnapshot.docs.map((doc) => {
+					const data = doc.data();
+					totalRatings += data.RatingValue;
+					return data;
+				});
+				this.numberOfRatings = this.ratings.length;
+				if (this.numberOfRatings > 0) {
+					this.averageRating = totalRatings / this.numberOfRatings;
+				}
 			} catch (error) {
 				console.error("Error fetching ratings:", error);
 			}
@@ -94,6 +149,15 @@ export default {
 	},
 	mounted() {
 		const auth = getAuth();
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				this.$root.user = user;
+				this.fetchUserData();
+			} else {
+				console.log("No user found");
+			}
+		});
+		/* const auth = getAuth();
 		onAuthStateChanged(auth, async (user) => {
 			if (user) {
 				// If user is signed in
@@ -117,7 +181,7 @@ export default {
 				// If user is signed out
 				console.log("User signed out");
 			}
-		});
+		}); */
 	},
 };
 </script>
@@ -176,5 +240,9 @@ h1 {
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
+}
+
+#profile-photo {
+	height: 80px; /*kiv*/
 }
 </style>
