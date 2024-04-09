@@ -6,11 +6,24 @@
 				Logout
 			</button>
 		</div>
-		<div id="SecondDiv" class="scroll">to show ratings</div>
+		<div id="SecondDiv">
+			<div id="details">details here</div>
+			<div id="ratings" class="scroll">
+				<div v-for="(rating, index) in ratings" :key="index">
+					<Rating
+						:profilePhoto="profilePhoto"
+						:ratedByUsername="rating.RatedByUsername"
+						:ratingValue="rating.RatingValue"
+						:ratingComment="rating.RatingComment"
+					/>
+				</div>
+			</div>
+		</div>
+
 		<div id="ThirdDiv">
 			<h1 id="EditDetails">Edit Details</h1>
 		</div>
-		<div id="FourthDiv" class="scroll">
+		<div id="FourthDiv">
 			<p>to edit profile details</p>
 			<input type="file" @change="handleFileUpload" />
 			<button @click="uploadFile">Upload</button>
@@ -24,15 +37,6 @@
 			<router-link to="/leaverating">
 				Temporary link to LeaveRating
 			</router-link>
-		</div>
-		<!-- Iterate over ratings and display each one -->
-		<div v-for="(rating, index) in ratings" :key="index">
-			<Rating
-				:profilePhoto="profilePhoto"
-				:ratedByUsername="rating.RatedByUsername"
-				:ratingValue="rating.RatingValue"
-				:ratingComment="rating.RatingComment"
-			/>
 		</div>
 	</div>
 </template>
@@ -101,7 +105,8 @@ export default {
 						// If user document exists
 						const userData = userDocSnapshot.data();
 						this.username = userData.username;
-						console.log("Username:", username);
+						console.log("Username:", this.username);
+						await this.fetchRatings();
 					} else {
 						console.error("User document does not exist for:", user.uid);
 					}
@@ -113,7 +118,6 @@ export default {
 				console.log("User signed out");
 			}
 		});
-		this.fetchRatings();
 	},
 };
 </script>
@@ -157,5 +161,20 @@ h1 {
 	transition: all 0.5s;
 	cursor: pointer;
 	margin: 5px;
+}
+
+#ratings {
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+	padding: 20px 0;
+}
+
+.scroll {
+	margin: 4px, 4px;
+	padding: 4px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
 }
 </style>
