@@ -1,7 +1,7 @@
 <template>
 	<div id="container">
 		<div id="FirstDiv">
-			<h1 id="Username">username to be displayed here</h1>
+			<h1 id="Username">@{{ username }}</h1>
 			<button class="signout-button" type="button" v-on:click="signOut">
 				Logout
 			</button>
@@ -38,13 +38,15 @@
 </template>
 
 <script>
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import {
 	getFirestore,
 	collection,
 	query,
 	where,
 	getDocs,
+	doc,
+	getDoc,
 } from "firebase/firestore";
 import Rating from "../components/profile_components/Rating.vue";
 
@@ -55,6 +57,7 @@ export default {
 		return {
 			profilePhoto: "path/to/profile/photo.jpg",
 			ratings: [], // Array to store fetched ratings
+			username: "",
 		};
 	},
 	methods: {
@@ -64,7 +67,7 @@ export default {
 				const ratingsRef = collection(db, "Ratings");
 				const userRatingsQuery = query(
 					ratingsRef,
-					where("RatedUsername", "==", "John Doe")
+					where("RatedUsername", "==", this.username)
 				); // kiv, Change to the username of the current user
 				const querySnapshot = await getDocs(userRatingsQuery);
 				this.ratings = querySnapshot.docs.map((doc) => doc.data());
@@ -86,6 +89,30 @@ export default {
 		},
 	},
 	mounted() {
+		const auth = getAuth();
+		onAuthStateChanged(auth, async (user) => {
+			if (user) {
+				// If user is signed in
+				const db = getFirestore();
+				const userDocRef = doc(db, "Users", user.uid);
+				try {
+					const userDocSnapshot = await getDoc(userDocRef);
+					if (userDocSnapshot.exists()) {
+						// If user document exists
+						const userData = userDocSnapshot.data();
+						this.username = userData.username;
+						console.log("Username:", username);
+					} else {
+						console.error("User document does not exist for:", user.uid);
+					}
+				} catch (error) {
+					console.error("Error fetching user document:", error);
+				}
+			} else {
+				// If user is signed out
+				console.log("User signed out");
+			}
+		});
 		this.fetchRatings();
 	},
 };

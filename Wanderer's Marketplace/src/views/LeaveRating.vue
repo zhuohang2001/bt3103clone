@@ -31,7 +31,7 @@ export default {
 	name: "LeaveRating",
 	data() {
 		return {
-			ratedUsername: "John Doe", //kiv
+			ratedUsername: "wxy", //kiv
 			ratedByUsername: "Betty", //kiv
 			selectedRating: 0,
 			ratingComment: "",
