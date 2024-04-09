@@ -83,7 +83,8 @@ export default {
             quantity: data.Quantity,
             size: data.Size,
             timeCreation: data.timeCreation, 
-            userID: data.userID
+            userID: data.userID,
+            status: data.ListingStatus
           };
         });
         console.log(this.products)
