@@ -11,6 +11,7 @@ import ListingDetail from "@/views/ListingDetail.vue";
 import ListingDetailAction from "@/views/ListingDetailAction.vue";
 import LeaveRating from "@/views/LeaveRating.vue";
 import AvailableListingShopper from "@/views/AvailableListingShopper.vue";
+import ListingOfferAction from "@/views/ListingOfferAction.vue";
 
 const routes = [
 	{
@@ -72,6 +73,11 @@ const routes = [
 		path: "/availablelistingshopper",
 		name: "AvailableListingShopper",
 		component: AvailableListingShopper,
+	},
+	{
+		path: "/listingofferaction",
+		name: "ListingOfferAction",
+		component: ListingOfferAction,
 	}
    
 ];

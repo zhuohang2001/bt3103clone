@@ -8,6 +8,9 @@
 				<button class="action-button" @click="buttonConfig.action" :disabled="hasPendingOffer">
 					{{ buttonConfig.label }}
 				</button>
+				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="viewOffers">
+					View Offers
+				</button>
 			</div>
 		</div>
 	</template>
@@ -96,6 +99,9 @@
 			},
 			extendOffer() {
 				this.$router.push({ name: 'ListingDetailAction' });
+			},
+			viewOffers() {
+				this.$router.push({ name: 'ListingOfferAction' });
 			},
 			// You can define other actions for different states here
 			async checkForExistingOffer() {
