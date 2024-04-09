@@ -10,7 +10,11 @@
 		<div id="ThirdDiv">
 			<h1 id="EditDetails">Edit Details</h1>
 		</div>
-		<div id="FourthDiv" class="scroll">to edit profile details</div>
+		<div id="FourthDiv" class="scroll">
+			<p>to edit profile details</p>
+			<input type="file" @change="handleFileUpload" />
+			<button @click="uploadFile">Upload</button>
+		</div>
 	</div>
 	<div>
 		<div id="nav-links">
