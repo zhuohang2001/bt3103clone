@@ -67,6 +67,7 @@
     .product-info {
         padding: 16px;
         text-align: center;
+        background-color: #fff1e7;
     }
 
     .product-name {

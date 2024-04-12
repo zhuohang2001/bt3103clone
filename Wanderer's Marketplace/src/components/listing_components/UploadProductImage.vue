@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 export default {
 	name: "UploadProductImage",
 	props: {
@@ -22,12 +24,21 @@ export default {
 		handleFileChange(event) {
 			const file = event.target.files[0];
 			if (file) {
-				// You can perform additional validation here if needed
-				const reader = new FileReader();
-				reader.onload = () => {
-					this.$emit("update:imageSrc", reader.result);
-				};
-				reader.readAsDataURL(file);
+				// Upload the file to Firebase Storage
+				const storage = getStorage();
+				const storageRef = ref(storage, 'product-images/' + file.name);
+				uploadBytes(storageRef, file).then((snapshot) => {
+					console.log('Uploaded a blob or file!');
+					// Get the download URL
+					getDownloadURL(snapshot.ref).then((downloadURL) => {
+						console.log('File available at', downloadURL);
+						// Emit the download URL
+						this.$emit("update:imageSrc", downloadURL);
+					});
+				}).catch((error) => {
+					console.error("Upload failed", error);
+					// Handle any errors
+				});
 			}
 		},
 	},
