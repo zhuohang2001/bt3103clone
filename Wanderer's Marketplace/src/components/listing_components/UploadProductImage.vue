@@ -67,7 +67,7 @@ export default {
 }
 
 .image-container img {
-	width: 50%;
+	width: 60%;
 	height: auto;
 	border-radius: 10px;
 	justify-content: center;
