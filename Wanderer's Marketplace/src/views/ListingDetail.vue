@@ -1,4 +1,7 @@
 	<template>
+		<div class="product-name-header">
+			<h1>{{ productDetails.name }}</h1>
+		</div>
 		<div class="product-details-container">
 			<div class="left">
 				<ProductImage />
@@ -24,8 +27,6 @@
 	const db = getFirestore(firebaseApp);
 	import { collection, query, where, getDocs } from 'firebase/firestore';
 	import { mapState } from 'vuex';
-	
-
 
 	export default {
 		name: "ListingDetail",
@@ -142,8 +143,15 @@
 		justify-content: center;
 		align-items: stretch;
 		height: calc(100vh - 80px);
-		padding: 50px;
+		padding-left: 50px;
+		padding-top: 10px;
 		gap: 25px;
+	}
+
+	h1 {
+		margin-top: 20px;
+		text-align: left;
+		margin-left: 40px;
 	}
 
 	.left {
