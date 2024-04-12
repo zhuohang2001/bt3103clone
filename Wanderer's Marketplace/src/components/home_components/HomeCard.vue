@@ -65,20 +65,29 @@
     }
 
     .product-info {
-        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* This will vertically center the items */
+        align-items: center; /* This will horizontally center the items */
+        padding: 8px; /* Reduced padding */
         text-align: center;
         background-color: #fff1e7;
+        height: 82px; /* You may need to adjust this depending on the content */
     }
 
     .product-name {
         font-size: 1rem;
         color: #333;
-        margin-bottom: 8px;
-        word-wrap: break-word;
+        margin: 0;
+        padding: 0 8px;
+        white-space: normal; /* This allows the text to wrap */
+        overflow: visible; /* This makes sure that text is not hidden */
+        word-wrap: break-word; /* This will break long words to prevent overflow */
     }
 
     .product-status {
         font-size: 0.8rem;
+        margin: 4px 0;
         /* Remove color property from here */
     }
 
