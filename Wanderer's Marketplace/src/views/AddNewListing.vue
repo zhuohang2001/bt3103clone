@@ -89,7 +89,7 @@ export default {
 				const docRef = await setDoc(doc(db, "Listings", listingID), {
 					ListingID: listingID,
 					UserID: this.userUID,
-					ProductImage: null,
+					ProductImage: this.imageSrc,
 					ProductName: productName,
 					Quantity: quantity,
 					Colour: colour,
