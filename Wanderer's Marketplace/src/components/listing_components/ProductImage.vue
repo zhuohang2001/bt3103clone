@@ -2,7 +2,7 @@
 	<div class="product-image">
 		<div class="title">Product Image</div>
 		<div class="image-container">
-			<img src="/images/logo_without_words.png" alt="Product Image" />
+			<img :src="imageSrc" alt="Product Image" />
 		</div>
 	</div>
 </template>
@@ -41,7 +41,7 @@ export default {
 }
 
 .image-container img {
-	width: 50%;
+	width: 60%;
 	height: auto;
 	border-radius: 10px;
 }
