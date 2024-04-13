@@ -44,10 +44,25 @@
 		<div id="ThirdDiv">
 			<h1 id="EditDetails">Edit Details</h1>
 		</div>
+		<div v-if="showCropperModal" class="cropper-modal">
+			<img ref="imageElement" style="max-width: 100%" />
+			<div class="cropper-buttons">
+				<button @click="getCroppedImageAndUpload">Upload</button>
+				<button @click="cancelCropping">Cancel</button>
+			</div>
+		</div>
 		<div id="FourthDiv">
 			<p>to edit profile details</p>
-			<input type="file" @change="handleFileUpload" />
-			<button @click="uploadFile">Upload</button>
+			<button @click="triggerFileInput" class="edit-photo-button">
+				Edit Profile Photo
+			</button>
+			<input
+				type="file"
+				id="inputImage"
+				@change="handleFileChange"
+				class="hidden"
+				ref="fileInput"
+			/>
 		</div>
 	</div>
 	<div>
@@ -73,7 +88,10 @@ import {
 	doc,
 	getDoc,
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Rating from "../components/profile_components/Rating.vue";
+import Cropper from "cropperjs";
+import "cropperjs/dist/cropper.min.css";
 
 export default {
 	name: "Profile",
@@ -82,11 +100,14 @@ export default {
 		return {
 			username: "",
 			ratings: [],
-			profilePhoto: "/images/logo_with_words.png",
+			profilePhoto: "",
 			dateJoined: "",
 			telegramHandle: "",
 			averageRating: 0,
 			numberOfRatings: 0,
+			showCropperModal: false,
+			cropper: null,
+			croppedImage: null,
 		};
 	},
 	methods: {
@@ -100,6 +121,7 @@ export default {
 					const userData = userDocSnapshot.data();
 					this.username = userData.username;
 					this.telegramHandle = userData.telegramHandle;
+					this.profilePhoto = userData.profilePhoto;
 				} else {
 					console.error("User document does not exist for:", user.uid);
 				}
@@ -146,6 +168,63 @@ export default {
 					console.error("Error signing out:", error);
 				});
 		},
+		triggerFileInput() {
+			this.$refs.fileInput.click();
+		},
+		handleFileChange(event) {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					this.showCropperModal = true;
+					this.$nextTick(() => {
+						this.cropper = new Cropper(this.$refs.imageElement, {
+							aspectRatio: 1,
+							viewMode: 1,
+						});
+						this.cropper.replace(e.target.result);
+					});
+				};
+				reader.readAsDataURL(file);
+			}
+		},
+		getCroppedImageAndUpload() {
+			if (this.cropper) {
+				this.cropper.getCroppedCanvas().toBlob(async (blob) => {
+					const file = new File([blob], "profile-photo.png", {
+						type: "image/png",
+					});
+					await this.uploadCroppedImage(file);
+					this.showCropperModal = false;
+				}, "image/png");
+			}
+		},
+
+		async uploadCroppedImage(file) {
+			try {
+				const storage = getStorage();
+				const storageRef = ref(
+					storage,
+					`profile_photos/${this.$root.user.uid}/profile-photo.png`
+				);
+				const uploadTask = await uploadBytes(storageRef, file);
+				const downloadURL = await getDownloadURL(uploadTask.ref);
+				this.profilePhoto = downloadURL;
+
+				const db = getFirestore();
+				await updateDoc(doc(db, "Users", this.$root.user.uid), {
+					profilePhoto: downloadURL,
+				});
+
+				console.log("File uploaded successfully:", downloadURL);
+			} catch (error) {
+				console.error("Error uploading file:", error);
+			}
+		},
+		cancelCropping() {
+			this.showCropperModal = false;
+			this.$refs.inputImage.value = null;
+		},
 	},
 	mounted() {
 		const auth = getAuth();
@@ -157,31 +236,6 @@ export default {
 				console.log("No user found");
 			}
 		});
-		/* const auth = getAuth();
-		onAuthStateChanged(auth, async (user) => {
-			if (user) {
-				// If user is signed in
-				const db = getFirestore();
-				const userDocRef = doc(db, "Users", user.uid);
-				try {
-					const userDocSnapshot = await getDoc(userDocRef);
-					if (userDocSnapshot.exists()) {
-						// If user document exists
-						const userData = userDocSnapshot.data();
-						this.username = userData.username;
-						console.log("Username:", this.username);
-						await this.fetchRatings();
-					} else {
-						console.error("User document does not exist for:", user.uid);
-					}
-				} catch (error) {
-					console.error("Error fetching user document:", error);
-				}
-			} else {
-				// If user is signed out
-				console.log("User signed out");
-			}
-		}); */
 	},
 };
 </script>
@@ -243,6 +297,58 @@ h1 {
 }
 
 #profile-photo {
-	height: 80px; /*kiv*/
+	width: 200px; /* or any size */
+	height: 200px;
+	object-fit: cover; /* This will cover the area without stretching the image */
+}
+
+.cropper-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 100;
+	padding: 20px;
+}
+
+.cropper-modal img {
+	box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);
+	border-radius: 4px;
+	max-height: 80vh;
+}
+
+.cropper-buttons {
+	background-color: #4caf50;
+	color: white;
+	padding: 12px 24px;
+	border: none;
+	border-radius: 4px;
+	font-size: 16px;
+	margin-top: 12px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.cropper-buttons:hover {
+	background-color: #45a049;
+}
+
+.edit-photo-button {
+	background-color: #4caf50;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+}
+
+.hidden {
+	display: none;
 }
 </style>
