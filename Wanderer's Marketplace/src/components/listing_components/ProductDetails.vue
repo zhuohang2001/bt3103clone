@@ -26,7 +26,7 @@
 			</div>
 			<div class="header">Purchase Currency, Minimum Product Price and Maximum Product Price</div>
 			<div class="input-row">
-				<input type="text" v-model="currency" placeholder="Currency" id="currency"/>
+				<input type="text" id="currency" value="SGD" disabled />
 				<input
 					type="number"
 					step="0.01"

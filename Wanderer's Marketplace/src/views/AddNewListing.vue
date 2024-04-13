@@ -71,7 +71,7 @@ export default {
 			let quantity = document.getElementById("quantity").value;
 			let colour = document.getElementById("colour").value;
 			let size = document.getElementById("size").value;
-			let currency = document.getElementById("currency").value;
+			let currency = "SGD";
 			let minProductPrice = document.getElementById("minProductPrice").value;
 			let maxProductPrice = document.getElementById("maxProductPrice").value;
 			let deliveryFee = document.getElementById("deliveryFee").value;
@@ -82,6 +82,18 @@ export default {
 			let dateCreation = currentDate.toISOString().split("T")[0];
 			let timeCreation = currentDate.toTimeString().split(" ")[0];
 			let listingID = this.userUID + "-" + dateCreation + "-" + timeCreation;
+
+			// Check if product name is longer than 30 characters
+			if (productName.length > 30) {
+				alert("Product Name cannot be more than 30 characters.");
+				return; // Stop the function here
+			}
+
+			// Check for empty fields
+			if (!productName || !quantity || !colour || !size || !currency || !minProductPrice || !maxProductPrice || !deliveryFee || !country || !estimatedDeliveryDate) {
+				alert("All fields must be filled out.");
+				return; // Stop the function here
+			}
 
 			alert("Created your listing for: " + productName);
 
