@@ -131,6 +131,7 @@ import app from "../firebase.js";
 import firebaseApp from "../firebase.js";
 import { getFirestore } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
+import { query, where, collection, getDocs } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
@@ -194,6 +195,11 @@ export default {
 				// Check if the username is empty or contains only spaces
 				if (!this.username || this.username.trim() === "") {
 					throw new Error("Please provide a valid username.");
+				}
+				// Check if the username is already taken
+				const usernameExists = await this.checkUsernameAvailability(this.username);
+				if (usernameExists) {
+					throw new Error("Username is already taken. Please choose a different one.");
 				}
 				// Check if the email address is valid
 				if (!this.isValidEmail(this.email)) {
@@ -273,6 +279,17 @@ export default {
 					this.error = error.message; // Use default error message for other errors
 				}
 				console.error("Error creating account:", error.message);
+			}
+		},
+		async checkUsernameAvailability(username) {
+			try {
+				// Query Firestore to check if the username exists
+				const q = query(collection(db, "Users"), where("username", "==", username));
+				const querySnapshot = await getDocs(q);
+				return querySnapshot.size > 0; // Return true if username exists, false otherwise
+			} catch (error) {
+				console.error("Error checking username availability:", error.message);
+				return false; // Return false in case of any error
 			}
 		},
 	},
@@ -374,5 +391,15 @@ export default {
 	font-size: 15px;
 	color: #051e55;
 	font-weight: bold;
+}
+
+.password-match {
+	color: green;
+	margin-top: 20px;
+}
+
+.password-mismatch {
+	color: #ff3333;
+	margin-top: 20px;
 }
 </style>
