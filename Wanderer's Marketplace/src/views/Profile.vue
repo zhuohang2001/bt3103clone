@@ -62,6 +62,7 @@
 				@change="handleFileChange"
 				class="hidden"
 				ref="fileInput"
+				accept="image/*"
 			/>
 		</div>
 	</div>
@@ -87,6 +88,7 @@ import {
 	getDocs,
 	doc,
 	getDoc,
+	updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Rating from "../components/profile_components/Rating.vue";
@@ -190,13 +192,15 @@ export default {
 		},
 		getCroppedImageAndUpload() {
 			if (this.cropper) {
+				const originalFile = this.$refs.fileInput.files[0];
 				this.cropper.getCroppedCanvas().toBlob(async (blob) => {
-					const file = new File([blob], "profile-photo.png", {
-						type: "image/png",
+					const file = new File([blob], originalFile.name, {
+						type: originalFile.type,
 					});
 					await this.uploadCroppedImage(file);
 					this.showCropperModal = false;
-				}, "image/png");
+					this.resetFileInput();
+				}, originalFile.type);
 			}
 		},
 
@@ -205,7 +209,7 @@ export default {
 				const storage = getStorage();
 				const storageRef = ref(
 					storage,
-					`profile_photos/${this.$root.user.uid}/profile-photo.png`
+					`profile-photos/${this.$root.user.uid}/${file.name}`
 				);
 				const uploadTask = await uploadBytes(storageRef, file);
 				const downloadURL = await getDownloadURL(uploadTask.ref);
@@ -223,7 +227,10 @@ export default {
 		},
 		cancelCropping() {
 			this.showCropperModal = false;
-			this.$refs.inputImage.value = null;
+			this.resetFileInput();
+		},
+		resetFileInput() {
+			this.$refs.fileInput.value = ""; // Reset the file input
 		},
 	},
 	mounted() {
@@ -313,13 +320,14 @@ h1 {
 	justify-content: center;
 	align-items: center;
 	z-index: 100;
-	padding: 20px;
+	padding: 50px;
 }
 
 .cropper-modal img {
 	box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);
 	border-radius: 4px;
-	max-height: 80vh;
+	max-height: 80vh; /* Adjust this to ensure it fits in small screens */
+	max-width: 95%;
 }
 
 .cropper-buttons {
