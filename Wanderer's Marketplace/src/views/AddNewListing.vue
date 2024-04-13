@@ -83,15 +83,21 @@ export default {
 			let timeCreation = currentDate.toTimeString().split(" ")[0];
 			let listingID = this.userUID + "-" + dateCreation + "-" + timeCreation;
 
-			// Check if product name is longer than 30 characters
-			if (productName.length > 30) {
-				alert("Product Name cannot be more than 30 characters.");
+			// Check for empty fields and if an image has been uploaded
+			if (!this.imageSrc) {
+				alert("Please upload an image for the product.");
 				return; // Stop the function here
 			}
 
 			// Check for empty fields
-			if (!productName || !quantity || !colour || !size || !currency || !minProductPrice || !maxProductPrice || !deliveryFee || !country || !estimatedDeliveryDate) {
-				alert("All fields must be filled out.");
+			if (!productName || !quantity || !colour || !size || !minProductPrice || !maxProductPrice || !deliveryFee || !country || !estimatedDeliveryDate) {
+				alert("All fields must be filled out.\nDo also ensure the following:\n-Product Name, Colour, Size and Country are texts.\n-Purchase Quantity, Min. and Max. Product Price and Delivery Fee are numbers.");
+				return; // Stop the function here
+			}
+
+			// Check if product name is longer than 30 characters
+			if (productName.length > 38) {
+				alert("Product Name cannot be more than 38 characters.");
 				return; // Stop the function here
 			}
 
