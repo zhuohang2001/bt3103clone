@@ -18,7 +18,7 @@
       </div>
       <div class="form-group">
         <div class="remember-me">
-          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <input type="checkbox" id="rememberMe" name="rememberMe" v-model="rememberMe" @change="toggleRememberMe" >
           <label for="rememberMe"> Remember me</label>
         </div>
       </div>
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
 import app from "../firebase.js";
 export default {
   name: 'Login',
@@ -41,11 +41,24 @@ export default {
     return {
       email: '',
       password: '',
+      rememberMe: false,
       error: '',
       user: null,
     };
   },
   mounted() {
+    // Retrieve email and password from local storage if they exist
+    const storedEmail = localStorage.getItem('storedEmail');
+    const storedPassword = localStorage.getItem('storedPassword');
+    if (storedEmail && storedPassword) {
+      this.email = storedEmail;
+      this.password = storedPassword;
+    }
+    // Check if "Remember Me" is checked in local storage
+    const rememberMe = localStorage.getItem('rememberMe');
+    if (rememberMe === 'true') {
+      this.rememberMe = true;
+    }
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       console.log("Authentication state changed: ", user.email);
@@ -63,7 +76,24 @@ export default {
       try {
         // Call the Firebase signInWithEmailAndPassword method to authenticate the user
         const auth = getAuth();
-        await signInWithEmailAndPassword(auth, this.email, this.password);
+        const { user } = await signInWithEmailAndPassword(auth, this.email, this.password); // Destructure user from the response
+
+        if (!user.emailVerified) {
+            throw new Error("Please verify your email.");
+        }
+        
+        // Store email and password if "Remember Me" is checked
+        if (this.rememberMe) {
+          localStorage.setItem('storedEmail', this.email);
+          localStorage.setItem('storedPassword', this.password);
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          // Clear stored email and password if "Remember Me" is unchecked
+          localStorage.removeItem('storedEmail');
+          localStorage.removeItem('storedPassword');
+          localStorage.removeItem('rememberMe');
+        }
+        
         // If authentication is successful, redirect to home
         this.$router.push('/home');
       } catch (error) {
@@ -81,6 +111,10 @@ export default {
         }
         console.error('Error signing in:', error.code, error.message);
       }
+    },
+    toggleRememberMe() {
+      this.rememberMe = !this.rememberMe;
+      console.log('Check box:', this.rememberMe)
     }
   }
 }
@@ -154,15 +188,14 @@ export default {
   width: 300px; /* Adjust the width of the input fields */
   box-sizing: border-box;
   margin: 0 auto;
+  padding-left: 0;
 }
 .remember-me {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: row; 
   align-items: flex-start;
-  text-align: left;
-  flex-direction: row;
+  margin-left: 0;
 }
-
 
 .login-button {
   padding: 10px 20px;

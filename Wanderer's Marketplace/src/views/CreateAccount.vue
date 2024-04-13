@@ -124,6 +124,7 @@
 import {
 	getAuth,
 	createUserWithEmailAndPassword,
+	sendEmailVerification,
 	onAuthStateChanged,
 } from "firebase/auth";
 import { countries } from "countries-list";
@@ -251,6 +252,12 @@ export default {
 					this.password
 				);
 
+				// Send email verification
+                await sendEmailVerification(user);
+
+				// Show alert after verification email is sent
+				alert('Verification email sent! Please check your inbox and verify your email before logging in.');
+
 				// Save user details to Firestore
 				//const db = app.firestore();
 				await setDoc(doc(db, "Users", user.uid), {
@@ -264,7 +271,7 @@ export default {
 					profilePhoto: this.defaultPhotoURL,
 				});
 				// If account creation is successful, redirect to home or login page
-				this.$router.push("/home");
+				this.$router.push("/");
 			} catch (error) {
 				// Handle account creation errors here
 				if (error.code === "auth/invalid-email") {
