@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<div id="nav" v-if = "user ">
+		<div id="nav" v-if = "user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage">
 			<!-- <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /> -->
 			<router-link to="/home"><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /></router-link>
 			<div id="nav-links">
@@ -9,7 +9,7 @@
 				<router-link to="/profile"> Profile </router-link>
 			</div>
 		</div>
-		<div id="content" :style="{ paddingTop: user ? '100px' : '0' }">
+		<div id="content" :style="{ paddingTop: user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage ? '100px' : '0' }">
 			<router-view />
 		</div>
 	</div>
