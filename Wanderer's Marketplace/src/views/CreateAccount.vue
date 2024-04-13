@@ -175,7 +175,7 @@ export default {
 				console.log("User is not logged in.");
 			}
 		});
-		const defaultPhotoRef = ref(storage, "default pic.jpg"); // Replace with your actual image path in Firebase Storage
+		const defaultPhotoRef = ref(storage, "profile_photos/default.jpg"); // Replace with your actual image path in Firebase Storage
 		getDownloadURL(defaultPhotoRef)
 			.then((url) => {
 				this.defaultPhotoURL = url;
