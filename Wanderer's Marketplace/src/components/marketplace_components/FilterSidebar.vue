@@ -49,10 +49,12 @@
 
     <!-- Country select -->
     <div class="filter-item">
-      <select v-model="country">
+      <!-- <select v-model="country">
         <option disabled value="">Country of Purchase</option>
-        <!-- Populate with actual country options -->
-      </select>
+ 
+      </select> -->
+      <label class="filter-label">Country</label>
+      <input type="text" v-model="country" placeholder="Country of Purchase" class="search-input" />
     </div>
 
     <!-- Price range input -->
@@ -83,13 +85,13 @@
 export default {
   data() {
     return {
-      search: '',
-      category: '',
-      sort: '',
-      country: '',
-      maxPrice: null,
-      minDeliveryFee: null,
-      maxDeliveryFee: null
+      search: "",
+      category: null,
+      sort: "",
+      country: "",
+      maxPrice: "",
+      minDeliveryFee: "",
+      maxDeliveryFee: ""
     }
   },
   emits: ['filters-applied'],
@@ -108,12 +110,12 @@ export default {
     },
     resetFilters() {
       this.search = '';
-      this.category = '';
+      this.category = null;
       this.sort = '';
       this.country = '';
-      this.maxPrice = null;
-      this.minDeliveryFee = null;
-      this.maxDeliveryFee = null;
+      this.maxPrice = "";
+      this.minDeliveryFee = "";
+      this.maxDeliveryFee = "";
     }
   }
 }

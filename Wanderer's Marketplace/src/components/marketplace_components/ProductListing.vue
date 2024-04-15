@@ -15,7 +15,7 @@
   import { getFirestore } from 'firebase/firestore';
   import app from "@/firebase.js";
   const db = getFirestore(firebaseApp);
-  import { collection, query, where, getDocs } from 'firebase/firestore';
+  import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
   import { mapActions } from 'vuex';
 
   export default {
@@ -29,17 +29,18 @@
       ProductCard,
     },
     data() {
-      return {
-        products: [],
-      };
-    },
-    created() {
-      this.fetchProducts();
-    },
-    watch: {
+    return {
+      allProducts: [], // Store all products fetched initially
+      products: [],    // Products to display after applying filters
+    };
+  },
+  created() {
+    this.fetchAllProducts();
+  },
+  watch: {
     filters: {
       handler(newFilters) {
-        this.fetchProducts(newFilters);
+        this.applyFilters(newFilters);
       },
       deep: true
     }
@@ -52,38 +53,44 @@
         this.$router.push({ name: 'ListingDetail', params: { productId: product.id } });
         console.log("product", product)
       },
-    async fetchProducts(filters) {
+    async fetchAllProducts(filters) {
       try {
         // const { search, category, country, maxPrice, minDeliveryFee, maxDeliveryFee, sort } = filters;
         console.log("filters")
         console.log(filters)
         let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'Available'));
-        // console.log(this.$store.state.user)
-        //   if (this.$store.state.user) {
-        //     console.log('hi')
-        //     console.log(this.$store.state.user.uid)
-        //     const user_uid = this.$store.state.user.uid
-        //     q = query(q, where('UserID', '!=', user_uid));
-        //   }
-        if (filters) {
-            if (filters.category) {
-            q = query(q, where('Category', '==', filters.category));
-            }
-            if (filters.search) {
-              q = query(q, where('ProductName', '>=', filters.search), where('ProductName', '<=', filters.search + '\uf8ff'));
-            }
-            if (filters.country) {
-              q = query(q, where('Country', '==', filters.country));
-            }
-            if (filters.maxPrice !== null) {
-              q = query(q, where('MaxProductPrice', '<=', filters.maxPrice));
-            }
-            if (filters.minDeliveryFee !== null && filters.maxDeliveryFee !== null) {
-              q = query(q, where('DeliveryFee', '>=', filters.minDeliveryFee), where('DeliveryFee', '<=', filters.maxDeliveryFee));
-            }
-        }
+        console.log(this.$store.state.user)
+          if (this.$store.state.user) {
+            console.log('hi')
+            console.log(this.$store.state.user.uid)
+            const user_uid = this.$store.state.user.uid
+            q = query(q, where('UserID', '!=', user_uid));
+          }
+        // if (filters) {
+        //     if (filters.category && filters.category != "") {
+        //     q = query(q, where('Category', '==', filters.category));
+        //     }
+        //     if (filters.search && filters.search != "") {
+        //       q = query(q, where('ProductName', '>=', filters.search), where('ProductName', '<=', filters.search + '\uf8ff'));
+        //     }
+        //     if (filters.country  && filters.country != "") {
+        //       q = query(q, where('Country', '==', filters.country));
+        //     }
+        //     if (filters.maxPrice !== null  && filters.maxPrice != "") {
+        //       q = query(q, where('MaxProductPrice', '<=', filters.maxPrice));
+        //     }
+        //     if (filters.minDeliveryFee !== null && filters.maxDeliveryFee !== null  && filters.minDeliveryFee != "" && filters.maxDeliveryFee != "") {
+        //       q = query(q, where('DeliveryFee', '>=', filters.minDeliveryFee), where('DeliveryFee', '<=', filters.maxDeliveryFee));
+        //     }
+
+        //     if (filters.sort === 'Newest') {
+        //       q = query(q, orderBy('EstimatedDeliveryDate', 'desc')); // Newest first
+        //     } else if (filters.sort === 'Oldest') {
+        //       q = query(q, orderBy('EstimatedDeliveryDate', 'asc')); // Oldest first
+        //     }
+        // }
         const querySnapshot = await getDocs(q);
-        this.products = querySnapshot.docs.map(doc => {
+        this.allProducts = querySnapshot.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
@@ -106,10 +113,30 @@
             // Add other product details you want to display...
           };
         })
+        this.products = [...this.allProducts];
         console.log(this.products)
         console.log("showing products")
       } catch (error) {
         console.error("Error getting documents: ", error);
+      }
+    },
+    applyFilters(filters) {
+      this.products = this.allProducts
+      const temp = [...this.allProducts]
+      this.products = this.allProducts.filter(product => {
+        return (filters.search === ""|| product.name.toLowerCase().includes(filters.search.toLowerCase())) &&
+              //  (filters.category === null|| product.Category === filters.category) &&
+              (filters.country === ""|| product.country.toLowerCase().includes(filters.country.toLowerCase())) &&
+               (filters.maxPrice === "" || parseFloat(product.maxPrice) <= parseFloat(filters.maxPrice)) &&
+               (filters.minDeliveryFee === "" || parseFloat(product.deliveryFee) >= parseFloat(filters.minDeliveryFee)) &&
+               (filters.maxDeliveryFee === "" || parseFloat(product.deliveryFee) <= parseFloat(filters.maxDeliveryFee));
+      });
+      this.allProducts = temp;
+
+      if (filters.sort === 'Newest') {
+        this.products.sort((a, b) => new Date(b.deliveryDate).getTime() - new Date(a.deliveryDate).getTime());
+      } else if (filters.sort === 'Oldest') {
+        this.products.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
       }
     },
   },
