@@ -18,7 +18,7 @@
       </div>
       <div class="form-group">
         <div class="remember-me">
-          <input type="checkbox" id="rememberMe" name="rememberMe" v-model="rememberMe" @change="toggleRememberMe" >
+          <input type="checkbox" id="rememberMe" name="rememberMe"  @change="toggleRememberMe" >
           <label for="rememberMe"> Remember me</label>
         </div>
       </div>
@@ -55,10 +55,12 @@ export default {
       this.password = storedPassword;
     }
     // Check if "Remember Me" is checked in local storage
-    const rememberMe = localStorage.getItem('rememberMe');
-    if (rememberMe === 'true') {
-      this.rememberMe = true;
-    }
+    const rememberMeStored = localStorage.getItem('rememberMe');
+    this.rememberMe = rememberMeStored === 'true';  // Directly set rememberMe to true or false
+    this.$nextTick(() => {
+    // This code will run after Vue has updated the DOM based on the above changes
+      document.getElementById('rememberMe').checked = this.rememberMe;
+    });
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       console.log("Authentication state changed: ", user.email);
