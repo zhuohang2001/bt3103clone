@@ -1,50 +1,39 @@
 <template>
-    <div class="view-offers-outer-container" v-if="listing">
-      <div class="view-offers-inner-container" >
-        <h2 class="view-offers-heading">View Offers</h2>
-  
-        <!-- Listing Section -->
-        <div class="listing-section">
+  <div class="view-offers-page-container">
+    <div class="offers-and-details-container">
+      <div class="offers-list-container">
+        <div class="listing-details">
           <img :src="listing.imageUrl" alt="Listing Image" class="listing-image" />
-          <div class="listing-details">
-            <p class="listing-title">{{ listing.title }}</p>
-            <p class="listing-status">{{ listing.status }}</p>
-          </div>
+          <h2 class="listing-title">{{ listing.title }}</h2>
+          <p class="listing-status">{{ listing.status }}</p>
         </div>
-  
-        <!-- Offers Section -->
         <div class="offers-container">
-          <div 
-            v-for="offer in offers" 
-            :key="offer.id"
-            class="offer-card"
-            @click="selectOffer(offer)"
-          >
+          <div v-for="offer in offers" :key="offer.id" class="offer-card" @click="selectOffer(offer)">
             <img :src="getUserImageUrl(offer.OfferByUserID)" alt="User Image" class="user-image" />
             <div class="offer-info">
-              <p class="user-name">{{ offer.OfferByUserID }}</p>
+              <p class="user-name">{{ getUserName(offer.OfferByUserID) }}</p>
               <p class="offer-price">Offered: ${{ offer.OfferPrice }}</p>
             </div>
           </div>
         </div>
-  
-        <!-- Selected Offer Details -->
-        <div v-if="selectedOffer" class="selected-offer-details">
-          <h3>{{ selectedOffer.OfferByUserID }} has offered</h3>
-          <div class="offer-amount">$ {{ selectedOffer.OfferPrice }}</div>
-          <div class="offer-actions">
-            <button class="action-button accept-button" @click="acceptOffer(selectedOffer)">Accept</button>
-            <button class="action-button reject-button" @click="rejectOffer(selectedOffer)">Reject</button>
-          </div>
+      </div>
+      <div v-if="selectedOffer" class="selected-offer-details">
+        <h3 class="selected-offer-heading">{{ getUserName(selectedOffer.OfferByUserID) }}'s offer</h3>
+        <div class="offer-amount">$ {{ selectedOffer.OfferPrice }}</div>
+        <div class="offer-actions">
+          <button class="action-button accept-button" @click="acceptOffer(selectedOffer)">Accept</button>
+          <button class="action-button reject-button" @click="rejectOffer(selectedOffer)">Reject</button>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
     import { mapState } from 'vuex';
     import firebaseApp from '../../firebase.js';
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+    import { deleteDoc } from 'firebase/firestore';
 
     export default {
     name: "ViewListingOffers",
@@ -68,6 +57,41 @@
         this.fetchData();
     },
     methods: {
+      async acceptOffer(offer) {
+      // Assuming offer.id is the ID of the offer and listing.id is the ID of the listing
+      const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
+      try {
+        await updateDoc(listingDocRef, {
+          ListingStatus: "Accepted"
+        });
+        alert(`Accepted Offer $${offer.OfferPrice}`);
+        // If the offer is accepted successfully, emit an event
+        this.$emit('offerAccepted', this.listing);
+        this.$router.push('/');
+      } catch (error) {
+        console.error("Error updating listing status:", error);
+      }
+    },
+    async rejectOffer(offer) {
+      // Assuming offer.id is the ID of the offer document
+      const offerDocRef = doc(getFirestore(firebaseApp), "Offers", offer.id);
+      try {
+        await deleteDoc(offerDocRef); // Delete the offer document
+        // You might want to also remove the offer from the list or show a message
+        alert(`Rejected Offer $${offer.OfferPrice}`); // Show an alert message
+        // Remove the offer from the offers array
+        this.offers = this.offers.filter(o => o.id !== offer.id);
+        this.$router.push('/home');
+      } catch (error) {
+        console.error("Error deleting offer:", error);
+      }
+    },
+      async selectOffer(offer) {
+        if (Object.keys(this.users).length === 0) {
+            await this.fetchUsers();
+        }
+        this.selectedOffer = offer;
+      },
         async fetchData() {
         if (this.listingId) {
             await this.fetchListing();
@@ -110,21 +134,21 @@
         console.error("Error fetching offers:", error);
         }
     },
-        async fetchUsers() {
-        try {
-            const usersCollectionRef = collection(getFirestore(firebaseApp), "Users");
-            const querySnapshot = await getDocs(usersCollectionRef);
-            querySnapshot.forEach((doc) => {
-            // Use object notation to maintain reactivity
-            this.$set(this.users, doc.id, doc.data());
-            });
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-        },
+      async fetchUsers() {
+      try {
+          const usersCollectionRef = collection(getFirestore(firebaseApp), "Users");
+          const querySnapshot = await getDocs(usersCollectionRef);
+          querySnapshot.forEach((doc) => {
+              // Directly assign the fetched data to the users object
+              this.users[doc.id] = doc.data();
+          });
+      } catch (error) {
+          console.error("Error fetching users:", error);
+      }
+  },
         getUserName(userId) {
         // Revised to use object notation
-        return this.users[userId]?.username || 'Unknown';
+        return this.users[userId]?.username;
         },
         getUserImageUrl(userId) {
         // Revised to use object notation
@@ -136,83 +160,84 @@
 </script>
   
   
-  <style scoped>
-  .view-offers-outer-container {
-    background: #f0e6d2;
-    padding: 1em;
-    border-radius: 16px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-  }
-  
-  .view-offers-inner-container {
-    background: white;
-    border-radius: 16px;
-    padding: 2em;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    width: 100%;
-  }
-  
-  .view-offers-heading,
-  .listing-title,
-  .listing-status,
-  .offer-price,
-  .user-name {
-    text-align: center;
-  }
-  
-  .listing-section,
-  .offers-container,
-  .selected-offer-details {
-    margin-bottom: 1em;
-  }
-  
-  .listing-image {
-    max-width: 100%;
-    border-radius: 4px;
-  }
-  
-  .user-image {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
-  
-  .offer-card {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 0.5em;
-  }
-  
-  .offer-info {
-    margin-left: 1em;
-  }
-  
-  .action-button {
-    padding: 0.5em;
-    margin-top: 0.5em;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-  }
-  
-  .accept-button {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  .reject-button {
-    background-color: #f44336;
-    color: white;
-  }
-  </style>
-  
+<style scoped>
+.view-offers-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: #f0e6d2;
+  border-radius: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.offers-and-details-container {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.offers-list-container,
+.selected-offer-details {
+  width: 50%;
+  padding: 20px;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.offers-list-container {
+  margin-right: 20px; /* Adjust space between offers and details */
+}
+
+.listing-details {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.offer-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.offer-info {
+  margin-left: 10px;
+}
+
+.user-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.accept-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.reject-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.selected-offer-heading {
+  margin-bottom: 10px;
+}
+</style>
