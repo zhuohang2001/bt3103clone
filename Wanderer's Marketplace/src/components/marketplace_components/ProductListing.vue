@@ -60,12 +60,11 @@
         console.log(filters)
         let q = query(collection(db, 'Listings'), where('ListingStatus', '==', 'Available'));
         console.log(this.$store.state.user)
-          if (this.$store.state.user) {
-            console.log('hi')
-            console.log(this.$store.state.user.uid)
-            const user_uid = this.$store.state.user.uid
-            q = query(q, where('UserID', '!=', user_uid));
-          }
+        if (this.$store.state.user) {
+          console.log(this.$store.state.user.uid)
+          const user_uid = this.$store.state.user.uid
+          q = query(q, where('UserID', '!=', user_uid));
+        }
         // if (filters) {
         //     if (filters.category && filters.category != "") {
         //     q = query(q, where('Category', '==', filters.category));

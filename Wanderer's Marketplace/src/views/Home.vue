@@ -1,10 +1,13 @@
 <script>
 import HomeListings from '@/components/home_components/HomeListings.vue';
+import HelpingListings from '@/components/home_components/HelpingListings.vue';
+
 
 export default {
   name: 'Home',
   components: {
-    HomeListings
+    HomeListings,
+    HelpingListings
   },
 }
 </script>
@@ -25,7 +28,7 @@ export default {
     </div>
 
     <div id="FourthDiv" class="scroll">
-      <h1>Listings hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</h1>
+      <HelpingListings />
     </div>
   </div>
 </template>
