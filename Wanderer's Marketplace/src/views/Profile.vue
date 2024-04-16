@@ -47,8 +47,10 @@
 		<div v-if="showCropperModal" class="cropper-modal">
 			<img ref="imageElement" style="max-width: 100%" />
 			<div class="cropper-buttons">
-				<button @click="getCroppedImageAndUpload">Upload</button>
-				<button @click="cancelCropping">Cancel</button>
+				<button @click="getCroppedImageAndUpload" class="upload-button">
+					Upload
+				</button>
+				<button @click="cancelCropping" class="cancel-button">Cancel</button>
 			</div>
 		</div>
 		<div id="FourthDiv">
@@ -330,30 +332,25 @@ h1 {
 	max-width: 95%;
 }
 
-.cropper-buttons {
-	background-color: #4caf50;
-	color: white;
-	padding: 12px 24px;
-	border: none;
-	border-radius: 4px;
-	font-size: 16px;
-	margin-top: 12px;
-	cursor: pointer;
-	transition: background-color 0.3s;
-}
-
-.cropper-buttons:hover {
-	background-color: #45a049;
-}
-
-.edit-photo-button {
-	background-color: #4caf50;
-	color: white;
+.edit-photo-button,
+.upload-button {
 	padding: 10px 20px;
 	border: none;
-	border-radius: 5px;
+	border-radius: 30px;
+	background-color: #051e55;
+	color: #fff;
 	cursor: pointer;
-	font-size: 16px;
+	margin-top: 10px;
+}
+
+.cancel-button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 30px;
+	background-color: #fff;
+	color: #051e55;
+	cursor: pointer;
+	margin-top: 10px;
 }
 
 .hidden {
