@@ -1,6 +1,6 @@
 <template>
     <div class="confirmation-card">
-      <div class="confirmation-header"><b>Confirmation of Delivery</b></div>
+      <div class="confirmation-header"><b>Confirmation of <br>Delivery</b></div>
       <div class="confirmation-body">
         <div class="proof-purchase">
             <div class="proof-text"><b>Proof of Purchase</b></div>
@@ -85,15 +85,18 @@
   <style scoped>
   .confirmation-card {
     background-color: #ffffff;
-	border-radius: 20px;
-	padding: 1rem;
-	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    min-height: 150px;
+    flex-direction: column;
   }
   .proof-purchase{
     background-color: #fff1e7;
     padding: 1rem;
     border-radius: 10px;
     height: auto;
+    color: black;
   }
   .confirm-btn{
     padding: 10px 20px;
@@ -105,9 +108,12 @@
 	margin-top: 10px;
   }
   .confirmation-header {
+    color: black;
     margin-bottom: 10%;
+    font-size: large;
   }
   .confirmation-text {
     margin-top: 10%;
+    color: black;
   }
   </style>

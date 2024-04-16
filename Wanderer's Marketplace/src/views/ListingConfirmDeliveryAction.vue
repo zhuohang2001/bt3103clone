@@ -2,7 +2,10 @@
 	
 	<div class="product-details-container">
 		<div class="left">
+			<!--
 			<ProductImage :imageSrc="productDetails.imageUrl" />
+			-->
+			<ListingImageDetails :imageSrc = "productDetails.imageUrl" />
 		</div>
 		<div class="right">
 			<DeliveryConfirmation :listingID = "productDetails.ListingID" />
@@ -13,6 +16,7 @@
 <script>
 import ProductImage from "../components/listing_components/ProductImage.vue";
 import ProductDetailsViewing from "@/components/listing_components/ProductDetailsViewing.vue";
+import ListingImageDetails from "../components/listing_components/ListingImageDetails.vue";
 import DeliveryConfirmation from "../components/listing_components/DeliveryConfirmation.vue";
 import firebaseApp from '@/firebase.js';
 import { getFirestore , doc, updateDoc} from 'firebase/firestore';
@@ -23,7 +27,7 @@ import { mapState } from 'vuex';
 
 export default {
 	name: "ListingDetail",
-	components: { ProductImage, ProductDetailsViewing, DeliveryConfirmation },
+	components: { ProductImage, ProductDetailsViewing, DeliveryConfirmation, ListingImageDetails },
 	data() {
 		return {
 			// ...other data properties
