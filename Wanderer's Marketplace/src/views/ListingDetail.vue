@@ -94,6 +94,10 @@ export default {
 					label: 'Extend Offer',
 					action: this.extendOffer,
 				},
+				Purchased: {
+					label: 'Confirm Delivery',
+					action: this.confirmDelivery,
+				}
 				// Add other states and configurations as needed
 			};
 			return stateConfigs[this.currentListing?.listingStatus] || {};
@@ -108,6 +112,9 @@ export default {
 		},
 		viewOffers() {
 			this.$router.push({ name: 'ListingOfferAction' });
+		},
+		confirmDelivery() {
+			this.$router.push({name: 'ListingConfirmDeliveryAction'});
 		},
 		// You can define other actions for different states here
 		async checkForExistingOffer() {
