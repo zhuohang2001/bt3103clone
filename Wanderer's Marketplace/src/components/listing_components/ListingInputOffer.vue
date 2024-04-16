@@ -36,6 +36,7 @@
         ListingID: listing_uid,
         OfferByUserID: user_uid,
         OfferPrice: this.offer_amt,
+        purchaseProofImage: "",
         OfferStatus: "Available", // Default status when an offer is first created
       };
       console.log("offerObj", offerObject)
