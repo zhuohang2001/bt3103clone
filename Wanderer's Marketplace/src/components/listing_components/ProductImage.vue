@@ -2,14 +2,24 @@
 	<div class="product-image">
 		<div class="title">Product Image</div>
 		<div class="image-container">
-			<img :src="imageSrc" alt="Product Image" />
+			<img :src="currentListing.imageUrl" alt="Product Image" />
 		</div>
 	</div>
 </template>
 
 <script>
+    import { mapState } from 'vuex';
+
+
 export default {
 	name: "ProductImage",
+	computed: {
+        ...mapState(['currentListing']),
+        listingId() {
+        // Ensure that the ID is correctly retrieved from your Vuex state
+        return this.currentListing?.id;
+        },
+    },
 	props: {
 		imageSrc: {
 			type: String,
