@@ -3,7 +3,7 @@
     <img :src="product.imageUrl" alt="Product image" class="product-image">
     <div class="product-info">
       <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-price">$ {{ product.price }}</p>
+      <p class="product-price">$ {{ product.deliveryFee }}</p>
       <!-- Added location and date information -->
       <p class="product-location-date">{{ product.country }} | {{ product.date }}</p>
     </div>

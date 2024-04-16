@@ -23,12 +23,12 @@
                     required=""
                     readonly
                 />
-                <input type="text" v-model="colour" placeholder="Colour" id="colour" readonly/>
-                <input type="text" v-model="size" placeholder="Size" id="size" readonly/>
+                <input type="text" v-model="productDetails.colour" placeholder="Colour" id="colour" readonly/>
+                <input type="text" v-model="productDetails.size" placeholder="Size" id="size" readonly/>
             </div>
             <div class="header">Purchase Currency, Minimum Product Price and Maximum Product Price</div>
             <div class="input-row">
-                <input type="text" v-model="currency" placeholder="Currency" id="currency" readonly/>
+                <input type="text" v-model="productDetails.currency" placeholder="Currency" id="currency" readonly/>
                 <input
                     type="number"
                     step="0.01"
@@ -53,13 +53,13 @@
                 <input
                     type="number"
                     step="0.01"
-                    v-model="productDetails.deliveryPrice"
+                    v-model="productDetails.deliveryFee"
                     id="deliveryFee"
                     placeholder="Delivery Fee"
                     required=""
                     readonly
                 />
-                <input type="text" v-model="country" placeholder="Country" required="" id="country" readonly />
+                <input type="text" v-model="productDetails.country" placeholder="Country" required="" id="country" readonly />
             </div>
             <div class="header">Preferred Estimated Delivery Date</div>
             <div class="input-row">
