@@ -5,7 +5,7 @@
 			<ProductImage :imageSrc="productDetails.imageUrl" />
 		</div>
 		<div class="right">
-			<DeliveryConfirmation :listingID = "productDetails.ListingID" @delivery-confirmed = "handleDeliveryConfirmation"/>
+			<DeliveryConfirmation :listingID = "productDetails.ListingID" />
 		</div>
 	</div>
 </template>

@@ -16,21 +16,71 @@
       </div>
     </div>
   </template>
-  <script>
+<script>
+  import { mapState } from 'vuex';
+  import firebaseApp from '../../firebase.js';
+  import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
   export default {
     name: 'DeliveryConfirmation',
-    props: {
-        listingID: String
+    computed: {
+      ...mapState(['currentListing']),
+      listingId() {
+      // Ensure that the ID is correctly retrieved from your Vuex state
+      return this.currentListing?.id;
+      },
     },
+    data () {
+      return {
+        listing: {},
+      };
+    },
+    created() {
+      this.fetchData();
+    },
+    //props: {
+    //    listingID: String
+    //},
     methods: {
-      confirmDelivery() {
+      async confirmDelivery() {
         // Emit an event or call a method to handle the confirmation logic
-        this.$emit('delivery-confirmed', this.listingID);
-        
+        const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
+        try {
+          await updateDoc(listingDocRef, {
+            ListingStatus : "Completed"
+          });
+          alert('Confirmed Offer', this.listingId);
+          this.$emit('confirmedDelivery', this.listing);
+          this.$router.push('/home');
+        } catch (error) {
+          console.error("Error updating listing status:", error);
+        }
+      },
+      async fetchData() {
+        if (this.listingId) {
+          await this.fetchListing();
+        } else {
+          console.error("No listing ID provided");
+        }
       }
+    },
+    async fetchListing() {
+      try {
+        const docRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data()) {
+            this.listing = {
+            ...docSnap.data(),
+            id: docRef.id // Add the document ID to the listing object
+            };
+        } else {
+            console.error("No such listing!");
+        }
+        } catch (error) {
+        console.error("Error fetching listing:", error);
+        }
     }
   };
-  </script>
+</script>
   
   <style scoped>
   .confirmation-card {
