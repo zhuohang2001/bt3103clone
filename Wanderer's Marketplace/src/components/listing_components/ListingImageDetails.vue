@@ -1,6 +1,7 @@
 <template>
   <div class = "listing-image-details">
     <div class = "listing-name">{{ currentListing.name }}</div>
+    <div class="offer-price">${{ offerPrice }}</div>
     <div class="image-container">
 			<img :src="currentListing.imageUrl" alt="Product Image" />
 		</div>
@@ -9,6 +10,7 @@
 
 <script>
 import {mapState} from 'vuex';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
 export default {
   name: "ListingImageDetails",
@@ -25,6 +27,35 @@ export default {
 			required: true,
 		},
 	},
+  data() {
+    return {
+      offerPrice: null, // Placeholder for the offer price
+    };
+  },
+  created() {
+    this.getOfferPrice();
+  },
+  methods: {
+    async getOfferPrice() {
+      const db = getFirestore();
+      const q = query(
+        collection(db, 'Offers'),
+        where('ListingID', '==', this.listingId)
+      );
+
+      try {
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const offer = querySnapshot.docs[0].data();
+          this.offerPrice = offer.OfferPrice;
+        } else {
+          console.error('No offer found for the current listing');
+        }
+      } catch (error) {
+        console.error('Error getting offer price:', error);
+      }
+    },
+  },
 };
 </script>
 
@@ -42,6 +73,16 @@ export default {
 	margin-bottom: 1rem;
   text-align: left;
   margin-left: 10%;
+  color: black;
+  margin-top: 2%;
+}
+.offer-price {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 1rem;
+  text-align: left;
+  margin-left: 10%;
+  color: black;
 }
 
 .image-container {
