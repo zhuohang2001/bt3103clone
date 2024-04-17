@@ -1,25 +1,37 @@
 <template>
-    <div class="confirmation-card">
-      <div class="confirmation-header"><b>Confirmation of Delivery</b></div>
+  <div class="confirmation-card">
+      <div class="confirmation-header"><b>Confirmation of Purchase</b></div>
       <div class="confirmation-body">
-        <div class="proof-purchase">
-            <div class="proof-text"><b>Proof of Purchase</b></div>
-          <div class="document-container">
-            <!-- Icon or image goes here -->
-            <img src = "/icons/favicon_io/document icon.png" alt = "Document Icon" class = "document-icon">
+          <div class="proof-purchase">
+              <div class="proof-text"><b>Proof of Purchase</b></div>
+              <div class="upload-container">
+                  <!-- Label for the file input -->
+                  <label for="file-upload" class="upload-label">Upload Proof</label>
+                  <!-- Hidden file input, triggered by label click -->
+                  <input type="file" id="file-upload" @change="handleFileChange" accept="image/*" hidden />
+                  <!-- Icon or image goes here -->
+                  <img v-if="!this.receiptImageUrl" src="/icons/favicon_io/document icon.png" alt="Document Icon" class="document-icon">
+                  <!-- Display uploaded image if available -->
+                  <img v-if="this.receiptImageUrl" :src="this.receiptImageUrl" alt="Uploaded receipt image" class="uploaded-receipt">
+              </div>
           </div>
-        </div>
-        <div class="confirmation-text">
-          I confirm that I have received <br> authentic products as requested.
-        </div>
-        <button class="confirm-btn" @click="confirmDelivery">Confirm</button>   
+          <div class="confirmation-text">
+              I confirm that I have received <br> authentic products as requested.
+          </div>
+          <button class="confirm-btn" @click="confirmPurchase">Confirm</button>   
       </div>
-    </div>
-  </template>
+  </div>
+</template>
 <script>
 // ... other imports
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { mapState } from 'vuex';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import firebaseApp from '@/firebase.js';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+
+
 
 export default {
   name: 'PurchaseConfirmation',
@@ -45,7 +57,7 @@ export default {
             if (user) {
             this.userUID = user.uid;
             console.log('User is logged in');
-            this.fetchProducts(); // Fetch products once user is logged in
+            // this.fetchProducts(); // Fetch products once user is logged in
             } else {
             console.log("User is not logged in.")
             }
@@ -53,16 +65,17 @@ export default {
     },
   methods: {
     // Method to retrieve the current offer from state
+
     async getOffer() {
       const auth = getAuth();
       const user = auth.currentUser;
 
       if (user) {
         const db = getFirestore(firebaseApp);
-        const offersRef = collection(db, "Offers");
+        const offersRef = collection(db, "Offers"); //check
         const q = query(
           offersRef,
-          where("ListingID", "==", this.listingId),
+          where("ListingID", "==", this.$store.state.currentListing.id), //check
           where("OfferByUserID", "==", user.uid)
         );
 
@@ -88,7 +101,7 @@ export default {
       const file = event.target.files[0];
       if (file && this.offer) {
         const storage = getStorage();
-        const storageRef = ref(storage, `receipts/${this.offer.OfferID}/${file.name}`);
+        const storageRef = ref(storage, `receipts/${this.offer.OfferID}/${file.name}`); //check
         uploadBytes(storageRef, file).then((snapshot) => {
           getDownloadURL(snapshot.ref).then((downloadURL) => {
             this.updateOfferWithImage(downloadURL);
@@ -106,12 +119,33 @@ export default {
         await updateDoc(offerDocRef, {
           purchaseProofImage: imageUrl
         });
+        this.$emit('confirmedPurchase', this.listing);
+        // this.$router.push('/home');
         console.log('Offer updated with image URL');
       } catch (error) {
         console.error("Error updating offer with image:", error);
       }
     },
     // ... other methods
+    async confirmPurchase() {
+      try {
+        // Update the offer with the image URL
+        if (this.receiptImageUrl) {
+          await this.updateOfferWithImage(this.receiptImageUrl);
+        }
+        // Update the listing status to "Purchased"
+        const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.$store.state.currentListing.id);
+        await updateDoc(listingDocRef, {
+          ListingStatus: "Purchased"
+        });
+        console.log('Listing status updated to "Purchased"');
+        // Redirect to the home page
+        this.$router.push({ name: 'Home' }); // Use the correct route name for your home page
+      } catch (error) {
+        console.error("Error confirming purchase:", error);
+      }
+    },
+
   },
 };
 </script>
@@ -123,6 +157,12 @@ export default {
 	border-radius: 20px;
 	padding: 1rem;
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+  }
+  .document-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
   }
   .proof-purchase{
     background-color: #fff1e7;
@@ -144,5 +184,42 @@ export default {
   }
   .confirmation-text {
     margin-top: 10%;
+  }
+  .upload-container {
+      position: relative;
+      text-align: center;
+      margin-top: 20px; /* Adjust as needed */
+      display: flex; /* Use flexbox for alignment */
+      flex-direction: column; /* Stack children vertically */
+      align-items: center; /* Center children horizontally */
+  }
+
+  .upload-label {
+      display: inline-block;
+      background-color: #f9f9f9; /* Your preferred background color */
+      padding: 10px 20px;
+      border: 1px solid #ccc; /* Your preferred border styling */
+      border-radius: 5px; /* Your preferred border radius */
+      cursor: pointer;
+      /* Add any other styling you need for the button */
+      margin-top: 10px; /* Add space between the input and the button */
+      cursor: pointer;
+      text-align: center;
+  }
+
+  .uploaded-receipt {
+      max-width: 150px; /* Adjust as needed to match the size of the left image */
+      max-height: 150px; /* Adjust as needed to maintain aspect ratio */
+      border-radius: 5px;
+      margin-top: 10px;
+      object-fit: contain; /* This will ensure the image is resized within the dimensions, maintaining aspect ratio without being cropped */
+  }
+  .document-icon, .uploaded-receipt {
+    /* Apply the same width and height to both for consistency */
+    width: 150px; /* Adjust as needed */
+    height: 150px; /* Adjust as needed */
+    object-fit: contain;
+    display: block; /* Make these block elements */
+    margin: 0 auto; /* Auto margins for horizontal centering */
   }
   </style>

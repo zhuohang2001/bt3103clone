@@ -2,7 +2,7 @@
 	
 	<div class="product-details-container">
 		<div class="left">
-			<ProductImage :imageSrc="productDetails.imageUrl" />
+			<ListingImageDetails :imageSrc="productDetails.imageUrl" />
 		</div>
 		<div class="right">
 			<PurchaseConfirmation :listingID = "productDetails.ListingID" />
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import ListingImageDetails from "../components/listing_components/ListingImageDetails.vue";
 import ProductImage from "../components/listing_components/ProductImage.vue";
 import ProductDetailsViewing from "@/components/listing_components/ProductDetailsViewing.vue";
 import PurchaseConfirmation from "../components/listing_components/PurchaseConfirmation.vue";
@@ -23,7 +24,7 @@ import { mapState } from 'vuex';
 
 export default {
 	name: "ListingDetail",
-	components: { ProductImage, ProductDetailsViewing, PurchaseConfirmation },
+	components: { ListingImageDetails, ProductDetailsViewing, PurchaseConfirmation },
 	data() {
 		return {
 			// ...other data properties
@@ -56,11 +57,11 @@ export default {
         const listingRef = doc(db, 'Listings', listingID);
 				console.log('listingID')
         await updateDoc(listingRef, {
-          ListingStatus: 'Completed'
+          ListingStatus: 'Purchased'
         });
-				console.log("listing status updated to completed");
+				console.log("listing status updated to purchased");
         // Update local state if needed
-        // this.productDetails.listingStatus = 'Completed';
+        // this.productDetails.listingStatus = 'Purchased';
       } catch (error) {
         console.error("Error updating document: ", error);
       }

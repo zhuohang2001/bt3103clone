@@ -13,6 +13,9 @@ import LeaveRating from "@/views/LeaveRating.vue";
 import AvailableListingShopper from "@/views/AvailableListingShopper.vue";
 import ListingOfferAction from "@/views/ListingOfferAction.vue";
 import Payment from "@/views/Payment.vue";
+import ListingConfirmDeliveryAction from "@/views/ListingConfirmDeliveryAction.vue";
+import ListingConfirmPurchaseAction from "@/views/ListingConfirmPurchaseAction.vue";
+
 
 const routes = [
 	{
@@ -84,6 +87,16 @@ const routes = [
 		path: '/payment/:offerId',
 		name: 'Payment',
 		component: Payment
+	},
+	{
+		path: "/listingconfirmdeliveryaction",
+		name: "ListingConfirmDeliveryAction",
+		component: ListingConfirmDeliveryAction,
+	},
+	{
+		path: "/listingconfirmpurchaseaction",
+		name: "ListingConfirmPurchaseAction",
+		component: ListingConfirmPurchaseAction,
 	}
    
 ];

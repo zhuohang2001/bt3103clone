@@ -9,14 +9,26 @@
 		<div class="right">
 			<ProductDetailsViewing :product-details="productDetails" />
 			<div class="buttons-container">
-				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="deleteListing">
-					Delete Listing
+				<button v-if="productDetails.listingStatus === 'Available' && !hasPendingOffer" class="action-button" @click="extendOffer">
+					Extend Offer
 				</button>
-				<button class="action-button" @click="buttonConfig.action" :disabled="hasPendingOffer">
-					{{ buttonConfig.label }}
+				<button v-if="hasPendingOffer && productDetails.listingStatus === 'Available'" class="action-button" disabled>
+					Pending Offer
+				</button>
+				<button v-if="productDetails.listingStatus === 'Accepted'" class="action-button" @click="confirmPurchase">
+					Confirm Purchase
+				</button>
+				<button v-if="productDetails.listingStatus === 'Purchased'" class="action-button" @click="confirmDelivery">
+					Confirm Delivery
+				</button>
+				<button v-if="productDetails.listingStatus === 'Completed'" class="action-button" @click="leaveRating">
+					Leave Rating
 				</button>
 				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="viewOffers">
 					View Offers
+				</button>
+				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="deleteListing">
+					Delete Listing
 				</button>
 			</div>
 		</div>
@@ -94,6 +106,10 @@ export default {
 					label: 'Extend Offer',
 					action: this.extendOffer,
 				},
+				Accepted: {
+					label: 'Confirm Purchase',
+					action: this.confirmPurchase,
+				},
 				Purchased: {
 					label: 'Confirm Delivery',
 					action: this.confirmDelivery,
@@ -112,6 +128,9 @@ export default {
 		},
 		viewOffers() {
 			this.$router.push({ name: 'ListingOfferAction' });
+		},
+		confirmPurchase() {
+			this.$router.push({name: 'ListingConfirmPurchaseAction'});
 		},
 		confirmDelivery() {
 			this.$router.push({name: 'ListingConfirmDeliveryAction'});
