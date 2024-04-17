@@ -3,7 +3,7 @@
     <div class="offers-and-details-container">
       <div class="offers-list-container">
         <div class="listing-details">
-          <img :src="listing.imageUrl" alt="Listing Image" class="listing-image" />
+          <h2>Offers</h2>
           <h2 class="listing-title">{{ listing.title }}</h2>
           <p class="listing-status">{{ listing.status }}</p>
         </div>
@@ -18,7 +18,15 @@
         </div>
       </div>
       <div v-if="selectedOffer" class="selected-offer-details">
-        <h3 class="selected-offer-heading">{{ getUserName(selectedOffer.OfferByUserID) }}'s offer</h3>
+    <div class="selected-user-info">
+      <img :src="getUserImageUrl(selectedOffer.OfferByUserID)" alt="User Image" class="selected-user-image" />
+      <h2 class="selected-user-name">{{ getUserName(selectedOffer.OfferByUserID) }}</h2>
+      <p class="selected-user-telegram-id">
+        <span class="telegram-label">Telegram: </span>{{getUserTelegramId(selectedOffer.OfferByUserID) }}
+      </p>
+      </div>
+      <div class="selected-offer-amount">
+        <h2 class="selected-user-text"> has offered</h2>
         <div class="offer-amount">$ {{ selectedOffer.OfferPrice }}</div>
         <div class="offer-actions">
           <button class="action-button accept-button" @click="acceptOffer(selectedOffer)">Accept</button>
@@ -27,6 +35,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -58,19 +67,25 @@
     },
     methods: {
       async acceptOffer(offer) {
-      // Assuming offer.id is the ID of the offer and listing.id is the ID of the listing
-      const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
-      try {
-        await updateDoc(listingDocRef, {
-          ListingStatus: "Accepted"
-        });
-        alert(`Accepted Offer $${offer.OfferPrice}`);
-        // If the offer is accepted successfully, emit an event
-        this.$emit('offerAccepted', this.listing);
-        this.$router.push('/');
-      } catch (error) {
-        console.error("Error updating listing status:", error);
+        if (!this.selectedOffer) {
+      alert("No offer has been selected!");
+      return;
       }
+      // const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
+      // try {
+      //   await updateDoc(listingDocRef, {
+      //     ListingStatus: "Accepted"
+      //   });
+        console.log(this.selectedOffer.OfferID);
+        alert(`Accepted Offer $${offer.OfferPrice}`);
+        this.$router.push({
+          name: 'Payment',
+          params: { offerId: this.selectedOffer.OfferID } // Ensure the offer ID is correctly passed here
+        });
+
+      // } catch (error) {
+      //   console.error("Error updating listing status:", error);
+      // }
     },
     async rejectOffer(offer) {
       // Assuming offer.id is the ID of the offer document
@@ -146,13 +161,18 @@
           console.error("Error fetching users:", error);
       }
   },
+  getUserTelegramId(userId) {
+      // Retrieve the Telegram ID from the user's details
+      return this.users[userId]?.telegramHandle || 'No Telegram ID';
+  },
+
         getUserName(userId) {
         // Revised to use object notation
         return this.users[userId]?.username;
         },
         getUserImageUrl(userId) {
         // Revised to use object notation
-        return this.users[userId]?.profileImageUrl || 'default-profile.jpg';
+        return this.users[userId]?.profilePhoto || 'default-profile.jpg';
         },
         // acceptOffer and rejectOffer methods remain the same
     },
@@ -169,6 +189,7 @@
   border-radius: 16px;
   width: 100%;
   box-sizing: border-box;
+  
 }
 
 .offers-and-details-container {
@@ -199,12 +220,14 @@
 
 .offer-card {
   display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 14px;
+    transition: background-color 0.3s; /* Optional: for a smooth transition */
+  
 }
 
 .offer-info {
@@ -230,6 +253,7 @@
 .accept-button {
   background-color: #4CAF50;
   color: white;
+  margin-right: 10px;
 }
 
 .reject-button {
@@ -237,7 +261,61 @@
   color: white;
 }
 
-.selected-offer-heading {
-  margin-bottom: 10px;
+
+.selected-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .selected-user-image {
+    width: 80px; /* Set the desired width */
+    height: 80px; /* Set the desired height */
+    border-radius: 50%; /* Make it round */
+    border: 2px solid #ddd; /* Optional: add a border */
+    margin-bottom: 0px; /* Space below the image */
+  }
+
+  .selected-user-name {
+    font-size: 30px; /* Set the desired font size */
+    margin-bottom: 0px; /* Space below the name */
+  }
+  .telegram-label {
+    margin-right: 4px; /* Adjust space between label and ID */
+    font-weight: bold;
+    margin-bottom: 0px;
+  }
+
+  .selected-user-telegram-id {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+
+  .offer-amount {
+    margin-bottom: 5px;
+    margin-top: 0px;
+    font-size: 40px;
+    font-weight: bold;
 }
+
+
+.selected-user-text {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.selected-offer-amount {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.offer-card.selected {
+    background-color: #007bff; /* Bootstrap primary blue color */
+    color: white; /* Change text color to white for better readability */
+  }
 </style>
