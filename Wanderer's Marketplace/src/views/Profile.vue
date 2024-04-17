@@ -40,32 +40,91 @@
 				</div>
 			</div>
 		</div>
-
 		<div id="ThirdDiv">
-			<h1 id="EditDetails">Edit Details</h1>
-		</div>
-		<div v-if="showCropperModal" class="cropper-modal">
-			<img ref="imageElement" style="max-width: 100%" />
-			<div class="cropper-buttons">
-				<button @click="getCroppedImageAndUpload" class="upload-button">
-					Upload
-				</button>
-				<button @click="cancelCropping" class="cancel-button">Cancel</button>
-			</div>
+			<h1 id="EditDetails">Edit User Details</h1>
 		</div>
 		<div id="FourthDiv">
-			<p>to edit profile details</p>
-			<button @click="triggerFileInput" class="edit-photo-button">
-				Edit Profile Photo
-			</button>
-			<input
-				type="file"
-				id="inputImage"
-				@change="handleFileChange"
-				class="hidden"
-				ref="fileInput"
-				accept="image/*"
-			/>
+			<div id="edit-profile-photo">
+				<img
+					:src="profilePhoto"
+					alt="Current Profile"
+					id="currentProfilePhoto"
+					style="width: 100px; height: 100px"
+				/>
+				<br />
+				<button @click="triggerFileInput" class="edit-photo-button">
+					Edit Profile Photo
+				</button>
+				<input
+					type="file"
+					id="inputImage"
+					@change="handleFileChange"
+					class="hidden"
+					ref="fileInput"
+					accept="image/*"
+				/>
+				<div v-if="showCropperModal" class="cropper-modal">
+					<img ref="imageElement" style="max-width: 100%" />
+					<div class="cropper-buttons">
+						<button @click="getCroppedImageAndUpload" class="upload-button">
+							Upload
+						</button>
+						<button @click="cancelCropping" class="cancel-button">
+							Cancel
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="edit-text-input">
+				<label for="telegramHandle">Telegram Handle</label>
+				<input
+					type="text"
+					id="telegramHandle"
+					name="telegramHandle"
+					v-model="telegramHandle"
+					:class="{ edited: telegramHandleChanged }"
+				/><br />
+
+				<label for="cardholderName">Cardholder Name</label>
+				<input
+					type="text"
+					id="cardholderName"
+					name="cardholderName"
+					v-model="cardholderName"
+					:class="{ edited: cardholderNameChanged }"
+				/><br />
+
+				<label for="cardNumber">Card Number</label>
+				<input
+					type="text"
+					id="cardNumber"
+					name="cardNumber"
+					v-model="cardNumber"
+					:class="{ edited: cardNumberChanged }"
+				/><br />
+
+				<label for="CVV">CVV</label>
+				<input
+					type="text"
+					id="CVV"
+					name="CVV"
+					v-model="CVV"
+					:class="{ edited: CVVChanged }"
+				/><br />
+
+				<label for="expiryDate">Expiry Date</label>
+				<input
+					type="text"
+					id="expiryDate"
+					name="expiryDate"
+					v-model="expiryDate"
+					:class="{ edited: expiryDateChanged }"
+				/><br />
+
+				<button @click="confirmEdits" class="edit-details-button">
+					Confirm Edits
+				</button>
+			</div>
 		</div>
 	</div>
 	<div>
@@ -96,6 +155,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Rating from "../components/profile_components/Rating.vue";
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.min.css";
+const db = getFirestore();
+const storage = getStorage();
 
 export default {
 	name: "Profile",
@@ -112,13 +173,21 @@ export default {
 			showCropperModal: false,
 			cropper: null,
 			croppedImage: null,
+			cardholderName: "",
+			cardNumber: "",
+			CVV: "",
+			expiryDate: "",
+			initialTelegramHandle: "",
+			initialCardholderName: "",
+			initialCardNumber: "",
+			initialCVV: "",
+			initialExpiryDate: "",
 		};
 	},
 	methods: {
 		async fetchUserData() {
 			const user = this.$root.user;
 			if (user) {
-				const db = getFirestore();
 				const userDocRef = doc(db, "Users", user.uid);
 				const userDocSnapshot = await getDoc(userDocRef);
 				if (userDocSnapshot.exists()) {
@@ -126,6 +195,15 @@ export default {
 					this.username = userData.username;
 					this.telegramHandle = userData.telegramHandle;
 					this.profilePhoto = userData.profilePhoto;
+					this.cardholderName = userData.cardholderName;
+					this.cardNumber = userData.cardNumber;
+					this.CVV = userData.CVV;
+					this.expiryDate = userData.expiryDate;
+					this.initialTelegramHandle = userData.telegramHandle;
+					this.initialCardholderName = userData.cardholderName;
+					this.initialCardNumber = userData.cardNumber;
+					this.initialCVV = userData.CVV;
+					this.initialExpiryDate = userData.expiryDate;
 				} else {
 					console.error("User document does not exist for:", user.uid);
 				}
@@ -139,7 +217,6 @@ export default {
 		},
 		async fetchRatings() {
 			try {
-				const db = getFirestore();
 				const ratingsRef = collection(db, "Ratings");
 				const userRatingsQuery = query(
 					ratingsRef,
@@ -208,7 +285,6 @@ export default {
 
 		async uploadCroppedImage(file) {
 			try {
-				const storage = getStorage();
 				const storageRef = ref(
 					storage,
 					`profile-photos/${this.$root.user.uid}/${file.name}`
@@ -217,7 +293,6 @@ export default {
 				const downloadURL = await getDownloadURL(uploadTask.ref);
 				this.profilePhoto = downloadURL;
 
-				const db = getFirestore();
 				await updateDoc(doc(db, "Users", this.$root.user.uid), {
 					profilePhoto: downloadURL,
 				});
@@ -234,6 +309,27 @@ export default {
 		resetFileInput() {
 			this.$refs.fileInput.value = ""; // Reset the file input
 		},
+		async confirmEdits() {
+			try {
+				await updateDoc(doc(db, "Users", this.$root.user.uid), {
+					telegramHandle: this.telegramHandle,
+					cardholderName: this.cardholderName,
+					cardNumber: this.cardNumber,
+					CVV: this.CVV,
+					expiryDate: this.expiryDate,
+				});
+				alert("Your details have been updated successfully.");
+
+				this.initialTelegramHandle = this.telegramHandle;
+				this.initialCardholderName = this.cardholderName;
+				this.initialCardNumber = this.cardNumber;
+				this.initialCVV = this.CVV;
+				this.initialExpiryDate = this.expiryDate;
+			} catch (error) {
+				console.error("Error updating user details:", error);
+				alert("There was an error updating your details.");
+			}
+		},
 	},
 	mounted() {
 		const auth = getAuth();
@@ -245,6 +341,23 @@ export default {
 				console.log("No user found");
 			}
 		});
+	},
+	computed: {
+		telegramHandleChanged() {
+			return this.telegramHandle !== this.initialTelegramHandle;
+		},
+		cardholderNameChanged() {
+			return this.cardholderName !== this.initialCardholderName;
+		},
+		cardNumberChanged() {
+			return this.cardNumber !== this.initialCardNumber;
+		},
+		CVVChanged() {
+			return this.CVV !== this.initialCVV;
+		},
+		expiryDateChanged() {
+			return this.expiryDate !== this.initialExpiryDate;
+		},
 	},
 };
 </script>
@@ -333,7 +446,8 @@ h1 {
 }
 
 .edit-photo-button,
-.upload-button {
+.upload-button,
+.edit-details-button {
 	padding: 10px 20px;
 	border: none;
 	border-radius: 30px;
@@ -355,5 +469,13 @@ h1 {
 
 .hidden {
 	display: none;
+}
+
+input {
+	color: grey;
+}
+
+.edited {
+	color: black;
 }
 </style>
