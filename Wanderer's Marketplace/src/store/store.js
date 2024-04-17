@@ -1,7 +1,9 @@
 import { createStore } from "vuex";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore();
+const storage = getStorage();
 
 export default createStore({
 	state: {
@@ -53,6 +55,23 @@ export default createStore({
 				}
 			} catch (error) {
 				console.error("Error fetching user profile:", error);
+			}
+		},
+		async uploadProfilePhoto({ commit, state }, file) {
+			const storageRef = ref(
+				storage,
+				`profile-photos/${state.user.uid}/${file.name}`
+			);
+			try {
+				await uploadBytes(storageRef, file);
+				const downloadURL = await getDownloadURL(storageRef);
+				await updateDoc(doc(db, "Users", state.user.uid), {
+					profilePhoto: downloadURL,
+				});
+				commit("setUserProfile", { profilePhoto: downloadURL });
+				console.log("File uploaded successfully:", downloadURL);
+			} catch (error) {
+				console.error("Error uploading file:", error);
 			}
 		},
 	},
