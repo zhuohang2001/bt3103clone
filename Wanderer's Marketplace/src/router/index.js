@@ -13,6 +13,8 @@ import LeaveRating from "@/views/LeaveRating.vue";
 import AvailableListingShopper from "@/views/AvailableListingShopper.vue";
 import ListingOfferAction from "@/views/ListingOfferAction.vue";
 import ListingConfirmDeliveryAction from "@/views/ListingConfirmDeliveryAction.vue";
+import ListingConfirmPurchaseAction from "@/views/ListingConfirmPurchaseAction.vue";
+
 
 const routes = [
 	{
@@ -88,7 +90,7 @@ const routes = [
 	{
 		path: "/listingconfirmpurchaseaction",
 		name: "ListingConfirmPurchaseAction",
-		component: ListingConfirmDeliveryAction,
+		component: ListingConfirmPurchaseAction,
 	}
    
 ];

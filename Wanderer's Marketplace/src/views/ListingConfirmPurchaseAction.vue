@@ -2,7 +2,7 @@
 	
 	<div class="product-details-container">
 		<div class="left">
-			<ProductImage :imageSrc="productDetails.imageUrl" />
+			<ListingImageDetails :imageSrc="productDetails.imageUrl" />
 		</div>
 		<div class="right">
 			<PurchaseConfirmation :listingID = "productDetails.ListingID" />
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import ListingImageDetails from "../components/listing_components/ListingImageDetails.vue";
 import ProductImage from "../components/listing_components/ProductImage.vue";
 import ProductDetailsViewing from "@/components/listing_components/ProductDetailsViewing.vue";
 import PurchaseConfirmation from "../components/listing_components/PurchaseConfirmation.vue";
