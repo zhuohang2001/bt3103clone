@@ -82,8 +82,13 @@
 					id="telegramHandle"
 					name="telegramHandle"
 					v-model="telegramHandle"
-					:class="{ edited: telegramHandleChanged }"
-				/><br />
+					:class="{
+						edited: telegramHandleChanged,
+					}"
+					@blur="validateTelegramHandle"
+				/><span v-if="telegramHandleError" class="error-message"
+					>Please provide a valid Telegram handle.</span
+				><br />
 
 				<label for="cardholderName">Cardholder Name</label>
 				<input
@@ -92,7 +97,10 @@
 					name="cardholderName"
 					v-model="cardholderName"
 					:class="{ edited: cardholderNameChanged }"
-				/><br />
+					@blur="validateCardholderName"
+				/><span v-if="cardholderNameError" class="error-message"
+					>Please provide a valid cardholder name.</span
+				><br />
 
 				<label for="cardNumber">Card Number</label>
 				<input
@@ -101,7 +109,10 @@
 					name="cardNumber"
 					v-model="cardNumber"
 					:class="{ edited: cardNumberChanged }"
-				/><br />
+					@blur="validateCardNumber"
+				/><span v-if="cardNumberError" class="error-message"
+					>Please provide a valid card number containing numbers only.</span
+				><br />
 
 				<label for="CVV">CVV</label>
 				<input
@@ -110,16 +121,25 @@
 					name="CVV"
 					v-model="CVV"
 					:class="{ edited: CVVChanged }"
-				/><br />
+					@blur="validateCVV"
+				/><span v-if="CVVError" class="error-message"
+					>Please provide a valid 3-digit CVV.</span
+				><br />
 
 				<label for="expiryDate">Expiry Date</label>
 				<input
 					type="text"
 					id="expiryDate"
-					name="expiryDate"
+					ref="expiryDate"
 					v-model="expiryDate"
 					:class="{ edited: expiryDateChanged }"
-				/><br />
+					@blur="validateExpiryDate"
+					readonly
+				/>
+				<span v-if="expiryDateError" class="error-message">
+					Please provide a valid expiry date.
+				</span>
+				<br />
 
 				<button @click="confirmEdits" class="edit-details-button">
 					Confirm Edits
@@ -155,6 +175,9 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Rating from "../components/profile_components/Rating.vue";
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.min.css";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.css";
+import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 const db = getFirestore();
 const storage = getStorage();
 
@@ -182,6 +205,11 @@ export default {
 			initialCardNumber: "",
 			initialCVV: "",
 			initialExpiryDate: "",
+			telegramHandleError: false,
+			cardholderNameError: false,
+			cardNumberError: false,
+			CVVError: false,
+			expiryDateError: false,
 		};
 	},
 	methods: {
@@ -330,6 +358,49 @@ export default {
 				alert("There was an error updating your details.");
 			}
 		},
+		validateTelegramHandle() {
+			if (!this.telegramHandle || this.telegramHandle.trim() === "") {
+				this.telegramHandleError = true;
+			} else {
+				this.telegramHandleError = false;
+			}
+		},
+		validateCardholderName() {
+			if (!this.cardholderName || this.cardholderName.trim() === "") {
+				this.cardholderNameError = true;
+			} else {
+				this.cardholderNameError = false;
+			}
+		},
+		validateCardNumber() {
+			if (
+				!this.cardNumber ||
+				this.cardNumber.trim() === "" ||
+				!/^\d+$/.test(this.cardNumber)
+			) {
+				this.cardNumberError = true;
+			} else {
+				this.cardNumberError = false;
+			}
+		},
+		validateCVV() {
+			if (!this.CVV || this.CVV.trim() === "" || !/^\d{3}$/.test(this.CVV)) {
+				this.CVVError = true;
+			} else {
+				this.CVVError = false;
+			}
+		},
+		/* validateExpiryDate() {
+			const expiryMonth = parseInt(this.expiryDate.split("/")[0], 10);
+			const expiryYear = parseInt(this.expiryDate.split("/")[1], 10);
+			const expiryDateObject = new Date(expiryYear, expiryMonth, 0);
+			const currentDate = new Date();
+			if (expiryDateObject < currentDate) {
+				this.expiryDateError = true;
+			} else {
+				this.expiryDateError = false;
+			}
+		}, */
 	},
 	mounted() {
 		const auth = getAuth();
@@ -340,6 +411,16 @@ export default {
 			} else {
 				console.log("No user found");
 			}
+		});
+		this.$nextTick(() => {
+			flatpickr(this.$refs.expiryDate, {
+				plugins: [new monthSelectPlugin({ dateFormat: "m/Y" })],
+				minDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+				onChange: (selectedDates, dateStr) => {
+					this.expiryDate = dateStr;
+					console.log(dateStr);
+				},
+			});
 		});
 	},
 	computed: {
@@ -477,5 +558,11 @@ input {
 
 .edited {
 	color: black;
+}
+
+.error-message {
+	color: red;
+	font-size: 14px;
+	margin-left: 5px;
 }
 </style>
