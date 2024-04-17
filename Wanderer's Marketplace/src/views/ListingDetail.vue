@@ -9,8 +9,8 @@
 		<div class="right">
 			<ProductDetailsViewing :product-details="productDetails" />
 			<div class="buttons-container">
-				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="editListing">
-					Edit Listing
+				<button v-if="productDetails.listingStatus === 'Available'" class="action-button" @click="deleteListing">
+					Delete Listing
 				</button>
 				<button class="action-button" @click="buttonConfig.action" :disabled="hasPendingOffer">
 					{{ buttonConfig.label }}
@@ -27,10 +27,10 @@
 import ProductImage from "../components/listing_components/ProductImage.vue";
 import ProductDetailsViewing from "../components/listing_components/ProductDetailsViewing.vue";
 import firebaseApp from '@/firebase.js';
-import { getFirestore } from 'firebase/firestore';
-import app from "@/firebase.js";
+import { getFirestore, doc, deleteDoc } from 'firebase/firestore';
 const db = getFirestore(firebaseApp);
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { mapState } from 'vuex';
 
 export default {
@@ -116,6 +116,36 @@ export default {
 		confirmDelivery() {
 			this.$router.push({name: 'ListingConfirmDeliveryAction'});
 		},
+		deleteImage() {
+			const storage = getStorage(firebaseApp);
+
+			const imageRef = storageRef(storage, this.productDetails.imageUrl);
+			deleteObject(imageRef).then(() => {
+				console.log('Image successfully deleted');
+			});
+			alert("Listing successfully deleted!")
+			this.$router.push({ name: 'Home' }); // Navigate to Home after deletion
+		},
+
+		deleteListing() {
+			const db = getFirestore(firebaseApp);
+			const listingId = this.productDetails.id; // Make sure this is the correct ID
+
+			if (!listingId) {
+				alert("No valid listing ID found!");
+				return;
+			}
+
+			const docRef = doc(db, "Listings", listingId);
+			deleteDoc(docRef).then(() => {
+				console.log('Listing successfully deleted');
+			}).catch((error) => {
+				console.error('Failed to delete the listing:', error);
+			});
+
+			this.deleteImage();
+		}, 
+
 		// You can define other actions for different states here
 		async checkForExistingOffer() {
 			try {
