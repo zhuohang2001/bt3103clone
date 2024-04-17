@@ -8,7 +8,7 @@
 		</div>
 		<div id="SecondDiv">
 			<div id="details">
-				<img :src="profilePhoto" alt="Profile Photo" id="profile-photo" />
+				<ProfilePhoto />
 				<div id="user-info">
 					<div id="user-joined">Joined {{ dateJoined }}</div>
 					<div id="user-telegram">Telegram @{{ telegramHandle }}</div>
@@ -45,12 +45,7 @@
 		</div>
 		<div id="FourthDiv">
 			<div id="edit-profile-photo">
-				<img
-					:src="profilePhoto"
-					alt="Current Profile"
-					id="currentProfilePhoto"
-					style="width: 100px; height: 100px"
-				/>
+				<ProfilePhoto />
 				<br />
 				<button @click="triggerFileInput" class="edit-photo-button">
 					Edit Profile Photo
@@ -172,6 +167,7 @@ import {
 	updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ProfilePhoto from "../components/profile_components/ProfilePhoto.vue";
 import Rating from "../components/profile_components/Rating.vue";
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.min.css";
@@ -183,7 +179,7 @@ const storage = getStorage();
 
 export default {
 	name: "Profile",
-	components: { Rating },
+	components: { ProfilePhoto, Rating },
 	data() {
 		return {
 			username: "",
@@ -222,7 +218,6 @@ export default {
 					const userData = userDocSnapshot.data();
 					this.username = userData.username;
 					this.telegramHandle = userData.telegramHandle;
-					this.profilePhoto = userData.profilePhoto;
 					this.cardholderName = userData.cardholderName;
 					this.cardNumber = userData.cardNumber;
 					this.CVV = userData.CVV;
@@ -313,19 +308,8 @@ export default {
 
 		async uploadCroppedImage(file) {
 			try {
-				const storageRef = ref(
-					storage,
-					`profile-photos/${this.$root.user.uid}/${file.name}`
-				);
-				const uploadTask = await uploadBytes(storageRef, file);
-				const downloadURL = await getDownloadURL(uploadTask.ref);
-				this.profilePhoto = downloadURL;
-
-				await updateDoc(doc(db, "Users", this.$root.user.uid), {
-					profilePhoto: downloadURL,
-				});
-
-				console.log("File uploaded successfully:", downloadURL);
+				await this.$store.dispatch("uploadProfilePhoto", file);
+				console.log(file);
 			} catch (error) {
 				console.error("Error uploading file:", error);
 			}
@@ -497,12 +481,6 @@ h1 {
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
-}
-
-#profile-photo {
-	width: 200px; /* or any size */
-	height: 200px;
-	object-fit: cover; /* This will cover the area without stretching the image */
 }
 
 .cropper-modal {

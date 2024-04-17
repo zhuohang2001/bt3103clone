@@ -1,56 +1,72 @@
 <template>
 	<div id="app">
-		<div id="nav" v-if = "user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage">
+		<div
+			id="nav"
+			v-if="
+				user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage
+			"
+		>
 			<!-- <img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /> -->
-			<router-link to="/home"><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt="" /></router-link>
+			<router-link to="/home"
+				><img id="LogoTopLeft" src="/images/logo_with_words_2.png" alt=""
+			/></router-link>
 			<div id="nav-links">
 				<router-link to="/home"> Home </router-link> |
 				<router-link to="/marketplace"> Marketplace </router-link> |
 				<router-link to="/profile"> Profile </router-link>
+				<ProfilePhoto container-class="nav-profile-photo" />
 			</div>
 		</div>
-		<div id="content" :style="{ paddingTop: user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage ? '100px' : '0' }">
+		<div
+			id="content"
+			:style="{
+				paddingTop:
+					user && !isLoginPage && !isCreateAccountPage && !isPasswordResetPage
+						? '100px'
+						: '0',
+			}"
+		>
 			<router-view />
 		</div>
 	</div>
 </template>
 
 <script>
-import {onAuthStateChanged, getAuth} from "firebase/auth";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import ProfilePhoto from "./components/profile_components/ProfilePhoto.vue";
 
 export default {
 	name: "App",
+	components: { ProfilePhoto },
 	data() {
 		return {
 			user: false,
-      isLoginPage: false,
-      isCreateAccountPage: false,
-      isPasswordResetPage: false,
+			isLoginPage: false,
+			isCreateAccountPage: false,
+			isPasswordResetPage: false,
 		};
 	},
-  mounted() {
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.user = user;
-      }
-    })  
-    // Check if the current route is the login page
-    this.isLoginPage = this.$route.path === '/'; 
-    this.isCreateAccountPage = this.$route.path === '/createaccount'; 
-    this.isPasswordResetPage = this.$route.path === '/passwordreset';
-  },
-  watch: {
-    $route(to) {
-      // Update isLoginPage when the route changes
-      this.isLoginPage = to.path === "/";
-      this.isCreateAccountPage = to.path === "/createaccount";
-      this.isPasswordResetPage = to.path === "/passwordreset";
-    }
-  }
+	mounted() {
+		const auth = getAuth();
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				this.user = user;
+			}
+		});
+		// Check if the current route is the login page
+		this.isLoginPage = this.$route.path === "/";
+		this.isCreateAccountPage = this.$route.path === "/createaccount";
+		this.isPasswordResetPage = this.$route.path === "/passwordreset";
+	},
+	watch: {
+		$route(to) {
+			// Update isLoginPage when the route changes
+			this.isLoginPage = to.path === "/";
+			this.isCreateAccountPage = to.path === "/createaccount";
+			this.isPasswordResetPage = to.path === "/passwordreset";
+		},
+	},
 };
-
-
 </script>
 
 <style>
@@ -111,5 +127,10 @@ export default {
 
 body {
 	margin: 0;
+}
+
+.nav-profile-photo .profile-photo {
+	width: 50px;
+	height: 50px;
 }
 </style>

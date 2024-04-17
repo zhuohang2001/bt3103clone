@@ -8,4 +8,5 @@ import store from "./store/store.js";
 const app = createApp(App);
 app.use(store);
 app.use(router);
+store.dispatch("initializeAuth");
 app.mount("#app");
