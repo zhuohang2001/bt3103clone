@@ -23,7 +23,7 @@ import { mapState } from 'vuex';
 
 export default {
 	name: "ListingDetail",
-	components: { ProductImage, ProductDetailsViewing, PurchaseConfirmation },
+	components: { ListingImageDetails, ProductDetailsViewing, PurchaseConfirmation },
 	data() {
 		return {
 			// ...other data properties
@@ -56,11 +56,11 @@ export default {
         const listingRef = doc(db, 'Listings', listingID);
 				console.log('listingID')
         await updateDoc(listingRef, {
-          ListingStatus: 'Completed'
+          ListingStatus: 'Purchased'
         });
-				console.log("listing status updated to completed");
+				console.log("listing status updated to purchased");
         // Update local state if needed
-        // this.productDetails.listingStatus = 'Completed';
+        // this.productDetails.listingStatus = 'Purchased';
       } catch (error) {
         console.error("Error updating document: ", error);
       }

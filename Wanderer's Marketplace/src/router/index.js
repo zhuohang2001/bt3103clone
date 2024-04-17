@@ -84,6 +84,11 @@ const routes = [
 		path: "/listingconfirmdeliveryaction",
 		name: "ListingConfirmDeliveryAction",
 		component: ListingConfirmDeliveryAction,
+	},
+	{
+		path: "/listingconfirmpurchaseaction",
+		name: "ListingConfirmPurchaseAction",
+		component: ListingConfirmDeliveryAction,
 	}
    
 ];

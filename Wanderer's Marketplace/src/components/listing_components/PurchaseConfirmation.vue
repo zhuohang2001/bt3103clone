@@ -59,10 +59,10 @@ export default {
 
       if (user) {
         const db = getFirestore(firebaseApp);
-        const offersRef = collection(db, "Offers");
+        const offersRef = collection(db, "Offers"); //check
         const q = query(
           offersRef,
-          where("ListingID", "==", this.listingId),
+          where("ListingID", "==", this.$store.state.currentListing.id), //check
           where("OfferByUserID", "==", user.uid)
         );
 
@@ -88,7 +88,7 @@ export default {
       const file = event.target.files[0];
       if (file && this.offer) {
         const storage = getStorage();
-        const storageRef = ref(storage, `receipts/${this.offer.OfferID}/${file.name}`);
+        const storageRef = ref(storage, `receipts/${this.offer.OfferID}/${file.name}`); //check
         uploadBytes(storageRef, file).then((snapshot) => {
           getDownloadURL(snapshot.ref).then((downloadURL) => {
             this.updateOfferWithImage(downloadURL);
@@ -106,6 +106,8 @@ export default {
         await updateDoc(offerDocRef, {
           purchaseProofImage: imageUrl
         });
+        this.$emit('confirmedPurchase', this.listing);
+        this.$router.push('/home');
         console.log('Offer updated with image URL');
       } catch (error) {
         console.error("Error updating offer with image:", error);

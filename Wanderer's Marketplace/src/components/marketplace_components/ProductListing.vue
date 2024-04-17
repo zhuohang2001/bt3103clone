@@ -65,29 +65,7 @@
           const user_uid = this.$store.state.user.uid
           q = query(q, where('UserID', '!=', user_uid));
         }
-        // if (filters) {
-        //     if (filters.category && filters.category != "") {
-        //     q = query(q, where('Category', '==', filters.category));
-        //     }
-        //     if (filters.search && filters.search != "") {
-        //       q = query(q, where('ProductName', '>=', filters.search), where('ProductName', '<=', filters.search + '\uf8ff'));
-        //     }
-        //     if (filters.country  && filters.country != "") {
-        //       q = query(q, where('Country', '==', filters.country));
-        //     }
-        //     if (filters.maxPrice !== null  && filters.maxPrice != "") {
-        //       q = query(q, where('MaxProductPrice', '<=', filters.maxPrice));
-        //     }
-        //     if (filters.minDeliveryFee !== null && filters.maxDeliveryFee !== null  && filters.minDeliveryFee != "" && filters.maxDeliveryFee != "") {
-        //       q = query(q, where('DeliveryFee', '>=', filters.minDeliveryFee), where('DeliveryFee', '<=', filters.maxDeliveryFee));
-        //     }
-
-        //     if (filters.sort === 'Newest') {
-        //       q = query(q, orderBy('EstimatedDeliveryDate', 'desc')); // Newest first
-        //     } else if (filters.sort === 'Oldest') {
-        //       q = query(q, orderBy('EstimatedDeliveryDate', 'asc')); // Oldest first
-        //     }
-        // }
+        
         const querySnapshot = await getDocs(q);
         this.allProducts = querySnapshot.docs.map(doc => {
           const data = doc.data();
