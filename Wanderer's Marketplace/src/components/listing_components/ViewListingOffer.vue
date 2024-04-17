@@ -8,7 +8,8 @@
           <p class="listing-status">{{ listing.status }}</p>
         </div>
         <div class="offers-container">
-          <div v-for="offer in offers" :key="offer.id" class="offer-card" @click="selectOffer(offer)">
+          <div 
+      v-for="offer in offers" :key="offer.id" :class="{'offer-card': true, 'selected': selectedOffer && offer.id === selectedOffer.id}" @click="selectOffer(offer)">
             <img :src="getUserImageUrl(offer.OfferByUserID)" alt="User Image" class="user-image" />
             <div class="offer-info">
               <p class="user-name">{{ getUserName(offer.OfferByUserID) }}</p>
@@ -210,7 +211,7 @@
 }
 
 .offers-list-container {
-  margin-right: 20px; /* Adjust space between offers and details */
+  margin-right: 0px; /* Adjust space between offers and details */
 }
 
 .listing-details {
@@ -226,17 +227,21 @@
     background: white;
     border: 1px solid #ccc;
     border-radius: 14px;
-    transition: background-color 0.3s; /* Optional: for a smooth transition */
+    transition: background-color 0.3s; 
+    width: 80%;
   
 }
 
 .offer-info {
   margin-left: 10px;
+  font-size: 20px;
+  font-weight: bold;
+
 }
 
 .user-image {
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   margin-right: 10px;
 }

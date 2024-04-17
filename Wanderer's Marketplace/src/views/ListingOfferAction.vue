@@ -40,20 +40,12 @@ export default {
 	gap: 25px;
 }
 
+
 .left {
-	flex: 0.45; /* Adjust the flex ratio to make the left side thinner */
+	flex: 1;
 }
 
 .right {
-	flex: 0.55; /* Adjust the flex ratio to make the right side wider */
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	position: relative;
-}
-
-
-.left, .right {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
