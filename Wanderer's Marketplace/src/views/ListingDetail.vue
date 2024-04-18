@@ -1,13 +1,27 @@
 <template>
 	<div class="product-name-header">
-		<h1>{{ productDetails.name }}</h1>
+	  <h1>{{ productDetails.name }}</h1>
 	</div>
 	<div class="product-details-container">
-		<div class="left">
-			<ProductImage :imageSrc="productDetails.imageUrl" />
-		</div>
-		<div class="right">
-			<ProductDetailsViewing :product-details="productDetails" />
+	  <div class="left">
+		<ProductImage :imageSrc="productDetails.imageUrl" />
+	  </div>
+	  <div class="right">
+		<ProductDetailsViewing :product-details="productDetails" />
+		<div v-if="productDetails.listingStatus === 'Accepted'" class="accepted-offer-container">
+        <div class="accepted-offer-header">
+          <div class="accepted-offer-label">Accepted Offer:</div>
+          <div class="accepted-offer-detail-box">
+            <div class="detail">Username: <span>{{ acceptedOfferDetails.username }}</span></div>
+          </div>
+          <div class="accepted-offer-detail-box telegram-detail-box">
+            <a :href="`tg://resolve?domain=${acceptedOfferDetails.telegram}`" class="detail" target="_blank">Telegram: <span>{{ acceptedOfferDetails.telegram }}</span></a>
+          </div>
+          <div class="accepted-offer-detail-box">
+            <div class="detail">Offer Price: <span>${{ acceptedOfferDetails.offerPrice }}</span></div>
+          </div>
+        </div>
+      </div>
 			<div class="buttons-container">
 				<button v-if="productDetails.listingStatus === 'Available' && !hasPendingOffer" class="action-button" @click="extendOffer">
 					Extend Offer
@@ -41,7 +55,7 @@ import ProductDetailsViewing from "../components/listing_components/ProductDetai
 import firebaseApp from '@/firebase.js';
 import { getFirestore, doc, deleteDoc } from 'firebase/firestore';
 const db = getFirestore(firebaseApp);
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { mapState } from 'vuex';
 
@@ -52,6 +66,8 @@ export default {
 		return {
 			// ...other data properties
 			hasPendingOffer: false, // This will track whether a pending offer exists
+			acceptedOffer: null,
+   			offerUser: null,
 		};
 	},
 	watch: {
@@ -59,6 +75,11 @@ export default {
 			if (newVal !== oldVal) {
 			this.checkForExistingOffer();
 			}
+		},
+		'productDetails.listingStatus': function(newVal) {
+		if (newVal === 'Accepted') {
+		this.fetchAcceptedOffer();
+		}
 		},
 		user(newVal, oldVal) {
 			if (newVal !== oldVal) {
@@ -68,6 +89,9 @@ export default {
 		},
 		created() {
 		this.checkForExistingOffer();
+	},
+	mounted() {
+		this.fetchAcceptedOffer();
 	},
 	computed: {
 		...mapState(['currentListing', 'user']),
@@ -88,6 +112,24 @@ export default {
 			listingStatus: "Available"
 		};
 		},
+		acceptedOfferDetails() {
+			if (!this.acceptedOffer || !this.offerUser) {
+			return {
+				username: 'Loading...',
+				telegram: 'Loading...',
+				offerPrice: 'Loading...',
+			};
+			}
+			return {
+			username: this.offerUser.username,
+			telegram: this.offerUser.telegramHandle,
+			offerPrice: this.acceptedOffer.OfferPrice,
+			};
+		},
+  isCurrentUserTheLister() {
+    // Ensure the user object is defined before accessing its properties
+    return this.user && this.productDetails && this.user.uid === this.productDetails.UserID;
+  },
 
 		buttonConfig() {
 			// If there is a pending offer, return the configuration for the non-clickable button
@@ -165,6 +207,47 @@ export default {
 			this.deleteImage();
 		}, 
 
+	async fetchAcceptedOffer() {
+		if (this.productDetails.listingStatus === 'Accepted') {
+		try {
+			const offersRef = collection(db, 'Offers');
+			const q = query(
+			offersRef,
+			where('ListingID', '==', this.productDetails.id)
+			);
+
+			const querySnapshot = await getDocs(q);
+			if (!querySnapshot.empty) {
+			this.acceptedOffer = querySnapshot.docs[0].data();
+			console.log(this.acceptedOffer);
+			await this.fetchOfferUser(this.acceptedOffer.OfferByUserID);
+			} else {
+			console.error('No accepted offers found for this listing.');
+			this.acceptedOffer = null;
+			}
+		} catch (error) {
+			console.error('Error fetching accepted offer:', error);
+			this.acceptedOffer = null;
+		}
+		}
+	},
+	async fetchOfferUser(userID) {
+		try {
+		const userRef = doc(db, 'Users', userID);
+		const userSnap = await getDoc(userRef);
+
+		if (userSnap.exists()) {
+			this.offerUser = userSnap.data();
+		} else {
+			console.error('No user found for ID:', userID);
+			this.offerUser = null;
+		}
+		} catch (error) {
+		console.error('Error fetching user:', error);
+		this.offerUser = null;
+		}
+	},
+
 		// You can define other actions for different states here
 		async checkForExistingOffer() {
 			try {
@@ -172,11 +255,11 @@ export default {
 				const userID = this.user?.uid; // replace with actual current user id property
 				let q = query(collection(db, 'Offers'), where('ListingID', '==', listingID));
 				q = query(q, where('OfferByUserID', '==', userID))
-
 				// .where('OfferStatus', '==', 'Pending') //add check that offer is not of rejected
 
 				const querySnapshot = await getDocs(q);
 				this.hasPendingOffer = !querySnapshot.empty;
+
 				// const querySnapshot = await getDocs(q);
 				// this.offer = querySnapshot.docs.map(doc => {
 				// const data = doc.data();
@@ -199,41 +282,80 @@ export default {
 </script>
 
 <style scoped>
-.product-details-container {
-	display: flex;
-	justify-content: center;
-	align-items: stretch;
-	height: calc(100vh - 80px);
-	padding-left: 50px;
-	padding-top: 10px;
-	gap: 25px;
+  .product-details-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding: 20px;
+  }
+
+  .product-name-header {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .left, .right {
+    flex: 1;
+    padding: 10px;
+  }
+
+  .accepted-offer-container {
+  background-color: #FFA500; 
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+}
+  .accepted-offer-header {
+    background-color: #FFA500; 
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+  }.accepted-offer-detail-box {
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center; 
+  margin-left: 10px;
+  flex-grow: 0;
+  flex-shrink: 0; 
+  height: 15px;
 }
 
-h1 {
-	margin-top: 20px;
-	text-align: left;
-	margin-left: 40px;
+
+  .accepted-offer-label {
+  background-color: #FFA500; /* Keep label background the same as the container */
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-.left {
-	flex: 1;
-}
+  .accepted-offer-details {
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin-top: 10px; /* Space from label to details */
+  }
 
-.right {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	position: relative;
+  .detail {
+  color: #333;
+  font-weight: bold;
+  margin: 0 5px;
+  font-size: 15px;
 }
+  .detail > span {
+    font-weight: normal;
+  }
 
-.buttons-container {
-	display: flex;
-	justify-content: space-evenly; /* This will space out your buttons evenly */
-	width: 100%; /* Ensure the container takes full width */
-}
-
-.action-button {
+  .action-button {
 	padding: 10px 20px;
 	border: none;
 	border-radius: 30px;
@@ -242,4 +364,12 @@ h1 {
 	cursor: pointer;
 	margin-top: 10px;
 }
+
+  .telegram-detail-box {
+    transition: background-color 0.3s ease;
+  }
+  
+  .telegram-detail-box:hover {
+    background-color: #e6e6e6; 
+  }
 </style>
