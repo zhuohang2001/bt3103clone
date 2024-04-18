@@ -25,19 +25,29 @@ const db = getFirestore(firebaseApp);
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { mapState } from 'vuex';
+import { loadStripe } from '@stripe/stripe-js';
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
 
 export default {
   name: "Payment",
-  components: { ProductImage, ProductDetailsViewing },
+  components: { ProductImage, ProductDetailsViewing, StripeCheckout },
   props: {
   },
   data() {
     return {
       productDetails: {},
-      offerPrice: null
+      offerPrice: null,
+      stripePromise: null,
+      stripeOptions: {
+        pk: "pk_test_51P6wEnESKHXx7bolEjhOMLwFY2QlY6IS8plTEgXh0060tnO37z\
+		Qac6wR4OWMXSgRTOSkLu3ijPOXaP8fNf6GNESP00XUfvdzwB", // Replace with your Stripe public key
+        successUrl: window.location.origin + "/success",
+        cancelUrl: window.location.origin + "/cancel",
+      },
     };
   },
   created() {
+	this.stripePromise = loadStripe(this.stripeOptions.pk);
     this.fetchOfferDetails();
   },
 
@@ -48,6 +58,7 @@ export default {
 		// or return a default object structure if currentListing is null/undefined
 		console.log("currlisting", this.currentListing)
 		return this.currentListing || {
+			id: "",
 			name: "Loading...",
 			quantity: 0,
 			color: "",
@@ -62,6 +73,30 @@ export default {
 		}
   },
   methods: {
+	async createStripePrice() {
+    try {
+      const response = await fetch('http://localhost:3000/create-price', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: this.offerPrice, // Assume offerPrice is a dollar amount
+          currency: 'sgd', // or any other currency
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.priceId;
+    } catch (error) {
+      console.error('Error creating Stripe price:', error);
+      throw error;
+    }
+  },
     async fetchOfferDetails() {
       const offerId = this.$route.params.offerId; // Retrieve the offerId from the route parameters
       if (!offerId) {
@@ -94,6 +129,7 @@ export default {
 			const listingDoc = await getDoc(listingDocRef);
 			if (listingDoc.exists()) {
 				this.productDetails = listingDoc.data();
+				this.listingId = listingId;
 			} else {
 				console.error("No such listing found!");
 			}
@@ -101,43 +137,75 @@ export default {
 			console.error("Error fetching listing details:", error);
 		}
 	},
-	processPayment() {
-    // Here you would have your logic to process the payment
-    const offerId = this.$route.params.offerId;
-    console.log("Processing payment for offer", this.offerId);
-    if (!offerId) {
-      console.error("Offer ID is undefined");
-      return;
-    }
+	async processPayment() {
+		// Here you would have your logic to process the payment
+		const priceId = await this.createStripePrice();
+		const offerId = this.$route.params.offerId;
+		// const stripe = await this.stripePromise;
+		// const { error } = await stripe.redirectToCheckout({
+		// 	lineItems: [{
+		// 	price: priceId, // Replace with the price ID generated in your Stripe dashboard
+		// 	quantity: 1,
+		// 	}],
+		// 	mode: 'payment',
+		// 	successUrl: this.stripeOptions.successUrl,
+		// 	cancelUrl: this.stripeOptions.cancelUrl,
+		// });
+		// if (error) {
+		// 	console.error("Stripe error:", error);
+		// }
 
-    // Fetch the offer document to get the associated listing ID
-    const offerDocRef = doc(getFirestore(firebaseApp), "Offers", offerId);
-    getDoc(offerDocRef).then((offerDoc) => {
-      if (!offerDoc.exists()) {
-        console.error("No such offer found!");
-        return;
-      }
+		const response = await fetch('http://localhost:3000/create-checkout-session', {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+			priceId: priceId,  // Use the price ID from earlier
+			}),
+		});
 
-      // Extract listing ID from the offer document
-      const listingId = offerDoc.data().ListingID;
-      const listingDocRef = doc(getFirestore(firebaseApp), "Listings", listingId);
+		const { sessionId } = await response.json();
+		const stripe = await this.stripePromise;
 
-      // Update the listing's status to "Accepted"
-      updateDoc(listingDocRef, {
-        ListingStatus: "Accepted"
-      }).then(() => {
-        console.log(`Offer ${offerId} accepted and listing ${listingId} updated to Accepted.`);
-        alert(`Payment successful and offer accepted!`);
-        // Here you would probably also want to navigate to a success page or update the state
-      }).catch((error) => {
-        console.error("Error updating listing status:", error);
-        alert("There was an issue with processing the payment.");
-      });
+		// Redirect to the Checkout page hosted by Stripe
+		await stripe.redirectToCheckout({
+			sessionId: sessionId,
+		}).then((result) => {
+			if (result.error) {
+			alert(result.error.message);
+			}
+  });
+    
 
-    }).catch((error) => {
-      console.error("Error fetching offer details:", error);
-    });
-    this.$router.push('/home');
+		// Fetch the offer document to get the associated listing ID
+		const offerDocRef = doc(getFirestore(firebaseApp), "Offers", offerId);
+		getDoc(offerDocRef).then((offerDoc) => {
+		if (!offerDoc.exists()) {
+			console.error("No such offer found!");
+			return;
+		}
+
+		// Extract listing ID from the offer document
+		const listingId = offerDoc.data().ListingID;
+		const listingDocRef = doc(getFirestore(firebaseApp), "Listings", listingId);
+
+		// Update the listing's status to "Accepted"
+		updateDoc(listingDocRef, {
+			ListingStatus: "Accepted"
+		}).then(() => {
+			console.log(`Offer ${offerId} accepted and listing ${listingId} updated to Accepted.`);
+			alert(`Payment successful and offer accepted!`);
+			// Here you would probably also want to navigate to a success page or update the state
+		}).catch((error) => {
+			console.error("Error updating listing status:", error);
+			alert("There was an issue with processing the payment.");
+		});
+
+		}).catch((error) => {
+		console.error("Error fetching offer details:", error);
+		});
+		this.$router.push('/home');
   }
 }
 };
@@ -147,11 +215,16 @@ export default {
 .payment-container {
 	display: flex;
 	justify-content: center;
-	align-items: stretch;
+	align-items: flex-start;
 	height: calc(100vh - 80px);
 	padding-left: 50px;
 	padding-top: 10px;
-	gap: 85px;
+	gap: 30px;
+}
+
+.left, .right {
+  flex: 1; /* This will allow both children to share the space equally */
+  padding: 20px;
 }
 
 .left {
@@ -161,13 +234,13 @@ export default {
 
 .right {
 	display: flex;
+	flex-direction: column; /* Stack children vertically */
 	align-items: center;
+	justify-content: center; /* Center children vertically */
 	background-color: #f0e6d2;
 	padding: 20px;
-  width: 100%;
-	height: 40%;
 	border-radius: 10px;
-	overflow: hidden;
+	overflow: visible; /* Ensure that content is not hidden */
 }
 
 .price-container {
@@ -176,8 +249,8 @@ export default {
 	font-size: 45px; /* Larger font size */
 	padding: 40px; /* Add padding for spacing */
 	border-radius: 20px; /* Add border radius for rounded corners */
-	width: 40%; /* Take up almost the size of the whole right container */
-  height: 80%;
+	width: auto; /* Adjust width to fit content */
+	height: auto; /* Adjust height to fit content */
 }
 
 .pay-button {
@@ -188,6 +261,6 @@ export default {
 	padding: 10px 20px; /* Add padding for button size */
 	border-radius: 5px; /* Add border radius for rounded button */
 	cursor: pointer; /* Add pointer cursor on hover */
-  width: 60%;
+	width: 100%; /* Button width to fill container */
 }
 </style>
