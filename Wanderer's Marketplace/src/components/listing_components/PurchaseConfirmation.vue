@@ -6,19 +6,22 @@
               <div class="proof-text"><b>Proof of Purchase</b></div>
               <div class="upload-container">
                   <!-- Label for the file input -->
-                  <label for="file-upload" class="upload-label">Upload Proof</label>
+                  <label for="file-upload" class="upload-label">
+                    <img src="/icons/favicon_io/upload icon.png" alt="Upload Icon" class="upload-icon">
+                  </label>
                   <!-- Hidden file input, triggered by label click -->
                   <input type="file" id="file-upload" @change="handleFileChange" accept="image/*" hidden />
-                  <!-- Icon or image goes here -->
+                  <!-- Icon or image goes here 
                   <img v-if="!receiptImageUrl" src="/icons/favicon_io/document icon.png"  alt="Document Icon" class="document-icon">
+                  -->
                   <!-- Display uploaded image if available -->
                   <img v-if="receiptImageUrl" :src="receiptImageUrl" @load="imageLoaded" alt="Uploaded receipt image" class="uploaded-receipt">
               </div>
           </div>
           <div class="confirmation-text">
-              I confirm that I have received <br> authentic products as requested.
+              I confirm that I have purchased <br> authentic products as requested.
           </div>
-          <button class="confirm-btn" @click="confirmPurchase">Confirm</button>   
+          <button class="confirm-btn" @click="confirmPurchase">Update as Purchased</button>   
       </div>
   </div>
 </template>
@@ -199,16 +202,12 @@ export default {
   }
 
   .upload-label {
-      display: inline-block;
-      background-color: #f9f9f9; /* Your preferred background color */
-      padding: 10px 20px;
-      border: 1px solid #ccc; /* Your preferred border styling */
-      border-radius: 5px; /* Your preferred border radius */
-      cursor: pointer;
-      /* Add any other styling you need for the button */
-      margin-top: 10px; /* Add space between the input and the button */
-      cursor: pointer;
-      text-align: center;
+    display: inline-block;
+    cursor: pointer; /* Add cursor interaction */
+    padding: 0; /* Remove padding */
+    border: none; /* Remove border */
+    background-color: transparent; /* Make background transparent */
+    margin-top: 10%;
   }
 
   .uploaded-receipt {
@@ -225,5 +224,9 @@ export default {
     object-fit: contain;
     display: block; /* Make these block elements */
     margin: 0 auto; /* Auto margins for horizontal centering */
+  }
+  .upload-icon {
+    width: 3rem;
+    height: auto;
   }
   </style>
