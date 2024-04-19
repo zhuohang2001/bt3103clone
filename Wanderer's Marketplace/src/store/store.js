@@ -2,13 +2,8 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import createPersistedState from 'vuex-persistedstate';
 
-
-const db = getFirestore();
-const storage = getStorage();
-
-export default createStore({
+@@ -12,94 +12,62 @@
 	state: {
 		user: null, // This will hold the logged-in user state
 		currentListing: null, // Initialize currentListing
@@ -83,23 +78,35 @@ export default createStore({
 	},
 }); */
 
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 
 export default createStore({
 	state: {
 		user: null, // This will hold the logged-in user state
+		currentListing: null, // Initialize currentListing
 	},
+	plugins: [
+		createPersistedState({
+			paths: ["user", "currentListing"], // Specify which parts of the state you want to persist
+		}),
+	],
 	mutations: {
 		setUser(state, user) {
-			console.log("user setting")
-			console.log(user)
+			console.log("user setting");
+			console.log(user);
 			state.user = user;
+		},
+		setCurrentListing(state, listing) {
+			state.currentListing = listing;
 		},
 	},
 	actions: {
 		fetchUser({ commit }, user) {
-			commit('setUser', user);
+			commit("setUser", user);
+		},
+		setCurrentListing({ commit }, listing) {
+			commit("setCurrentListing", listing);
 		},
 	},
-})
+});

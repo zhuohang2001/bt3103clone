@@ -2,7 +2,7 @@
 	<div class="rating-container">
 		<div class="top">
 			<ProfilePhoto
-				:userID="this.$root.user.uid"
+				:userID="ratedByUserID"
 				:styleObject="{ width: '50px', height: '50px' }"
 			/>
 			<div class="top-right">
@@ -30,6 +30,10 @@ export default {
 			type: String,
 			required: true,
 		},*/
+		ratedByUserID: {
+			type: String,
+			required: true,
+		},
 		ratedByUsername: {
 			type: String,
 			required: true,

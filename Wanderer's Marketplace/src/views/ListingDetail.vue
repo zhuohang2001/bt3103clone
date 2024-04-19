@@ -211,17 +211,21 @@ export default {
 	},
 	methods: {
 		leaveRating() {
-			this.$router.push({
-				name: "LeaveRating",
-				params: {
-					listingUser: this.productDetails.UserID,
-					offerUser: this.acceptedOffer.OfferByUserID,
-				},
-				query: {
-					listingUser: this.productDetails.UserID,
-					offerUser: this.acceptedOffer.OfferByUserID,
-				},
-			});
+			if (!this.acceptedOffer) {
+				console.error("acceptedOffer is null, cannot navigate to LeaveRating.");
+				return;
+			}
+			this.$router
+				.push({
+					name: "LeaveRating",
+					params: {
+						listingUser: this.productDetails.UserID,
+						offerUser: this.acceptedOffer.OfferByUserID,
+					},
+				})
+				.catch((err) => {
+					console.error("Router navigation error:", err);
+				});
 		},
 		extendOffer() {
 			this.$router.push({ name: "ListingDetailAction" });

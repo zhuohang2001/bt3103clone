@@ -8,7 +8,7 @@
 		</div>
 		<div id="SecondDiv">
 			<div id="details">
-				<ProfilePhoto :userID="this.$root.user.uid"/>
+				<ProfilePhoto :userID="this.$root.user.uid" />
 				<div id="user-info">
 					<div id="user-joined">Joined {{ dateJoined }}</div>
 					<div id="user-telegram">Telegram @{{ telegramHandle }}</div>
@@ -32,6 +32,7 @@
 			<div id="ratings" class="scroll">
 				<div v-for="(rating, index) in ratings" :key="index">
 					<Rating
+						:ratedByUserID="rating.RatedByUserID"
 						:ratedByUsername="rating.RatedByUsername"
 						:ratingValue="rating.RatingValue"
 						:ratingComment="rating.RatingComment"
@@ -46,7 +47,7 @@
 		</div>
 		<div id="FourthDiv">
 			<div id="edit-profile-photo">
-				<ProfilePhoto :userID="this.$root.user.uid"/>
+				<ProfilePhoto :userID="this.$root.user.uid" />
 				<br />
 				<button @click="triggerFileInput" class="edit-photo-button">
 					Edit Profile Photo
