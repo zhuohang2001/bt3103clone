@@ -61,7 +61,7 @@ app.post('/create-checkout-session', async (req, res) => {
   
     try {
       const transfer = await stripe.transfers.create({
-        amount: offerPrice * 100, // Convert to cents
+        amount: offerPrice * 100,
         currency: 'sgd',
         destination: sellerStripeAccountId,
         // Optionally add: transfer_group, description, and other metadata
