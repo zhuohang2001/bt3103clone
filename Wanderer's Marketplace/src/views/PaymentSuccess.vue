@@ -22,11 +22,16 @@
 
 
         const offerDocRef = doc(db, "Offers", offerId);
+
 		await getDoc(offerDocRef).then((offerDoc) => {
 		if (!offerDoc.exists()) {
 			console.error("No such offer found!");
 			return;
 		}
+        updateDoc(offerDocRef, {
+            OfferStatus: "Accepted"
+        });
+        console.log(`Offer ${offerId} updated to Accepted.`);
 
 		// Extract listing ID from the offer document
 		const listingId = offerDoc.data().ListingID;
@@ -45,7 +50,7 @@
 		});
 
 		}).catch((error) => {
-		console.error("Error fetching offer details:", error);
+            console.error("Error fetching offer details:", error);
 		});
 		this.$router.push('/home');
       }
