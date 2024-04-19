@@ -56,5 +56,23 @@ app.post('/create-checkout-session', async (req, res) => {
     }
   });
 
+  app.post('/payout-seller', async (req, res) => {
+    const { offerPrice, sellerStripeAccountId } = req.body;  // Replace with actual variable names
+  
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: offerPrice * 100, // Convert to cents
+        currency: 'sgd',
+        destination: sellerStripeAccountId,
+        // Optionally add: transfer_group, description, and other metadata
+      });
+  
+      res.json({ success: true, transferId: transfer.id });
+    } catch (error) {
+      console.error('Error creating transfer:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -43,6 +43,31 @@
     methods: {
       async confirmDelivery() {
         // Emit an event or call a method to handle the confirmation logic
+        const offerPrice = this.listing.OfferPrice;
+        const sellerStripeAccountId = 'acct_xxx'; // Retrieve the connected account ID from your database
+
+        try {
+          const response = await fetch('/payout-seller', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              offerPrice,
+              sellerStripeAccountId,
+            }),
+          });
+
+          if (response.ok) {
+            console.log('Transfer to seller successful');
+            // Handle the rest of your confirmation logic
+          } else {
+            throw new Error('Network response was not ok.');
+          }
+        } catch (error) {
+          console.error('Error in confirming delivery:', error);
+        }
+
         const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
         try {
           await updateDoc(listingDocRef, {
