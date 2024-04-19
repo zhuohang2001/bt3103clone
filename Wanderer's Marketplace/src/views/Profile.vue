@@ -8,7 +8,7 @@
 		</div>
 		<div id="SecondDiv">
 			<div id="details">
-				<ProfilePhoto />
+				<ProfilePhoto :userID="this.$root.user.uid"/>
 				<div id="user-info">
 					<div id="user-joined">Joined {{ dateJoined }}</div>
 					<div id="user-telegram">Telegram @{{ telegramHandle }}</div>
@@ -32,10 +32,11 @@
 			<div id="ratings" class="scroll">
 				<div v-for="(rating, index) in ratings" :key="index">
 					<Rating
-						:profilePhoto="profilePhoto"
 						:ratedByUsername="rating.RatedByUsername"
 						:ratingValue="rating.RatingValue"
 						:ratingComment="rating.RatingComment"
+						:ratingType="rating.RatingType"
+						:ratingDate="rating.RatingDate"
 					/>
 				</div>
 			</div>
@@ -45,7 +46,7 @@
 		</div>
 		<div id="FourthDiv">
 			<div id="edit-profile-photo">
-				<ProfilePhoto />
+				<ProfilePhoto :userID="this.$root.user.uid"/>
 				<br />
 				<button @click="triggerFileInput" class="edit-photo-button">
 					Edit Profile Photo
@@ -243,7 +244,7 @@ export default {
 				const ratingsRef = collection(db, "Ratings");
 				const userRatingsQuery = query(
 					ratingsRef,
-					where("RatedUsername", "==", this.username)
+					where("RatedUserID", "==", this.$root.user.uid)
 				);
 				const querySnapshot = await getDocs(userRatingsQuery);
 				let totalRatings = 0;

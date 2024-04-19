@@ -1,10 +1,9 @@
 <template>
 	<div class="rating-container">
 		<div class="top">
-			<img
-				src="/images/logo_without_words.png"
-				alt="Profile Photo"
-				class="profile-photo"
+			<ProfilePhoto
+				:userID="this.$root.user.uid"
+				:styleObject="{ width: '50px', height: '50px' }"
 			/>
 			<div class="top-right">
 				<div class="username">{{ ratedByUsername }}</div>
@@ -15,20 +14,22 @@
 		</div>
 		<div v-if="ratingComment" class="comment">{{ ratingComment }}</div>
 		<div class="rating-info">
-			<span>{{ ratingType }} Rating from Shopper </span>
-			<span>|</span>
-			<span>{{ monthsPosted }} 2 months ago</span>
+			<span>Rating from {{ ratingType }} </span> |
+			<span>{{ getTimeAgo(ratingDate) }}</span>
 		</div>
 	</div>
 </template>
 
 <script>
+import ProfilePhoto from "../profile_components/ProfilePhoto.vue";
+
 export default {
+	components: { ProfilePhoto },
 	props: {
-		profilePhoto: {
+		/* profilePhoto: {
 			type: String,
 			required: true,
-		},
+		},*/
 		ratedByUsername: {
 			type: String,
 			required: true,
@@ -42,12 +43,44 @@ export default {
 			type: String,
 			default: "",
 		},
+		ratingType: {
+			type: String,
+			required: true,
+		},
+		ratingDate: {
+			type: String, //date?
+			required: true,
+		},
 	},
 	methods: {
 		getStarStyle(index) {
 			return {
 				color: index <= this.ratingValue ? "#051e55" : "#ccc",
 			};
+		},
+		getTimeAgo(dateString) {
+			const date = new Date(dateString);
+			const now = new Date();
+			const seconds = Math.round((now - date) / 1000);
+			const minutes = Math.round(seconds / 60);
+			const hours = Math.round(minutes / 60);
+			const days = Math.round(hours / 24);
+			const months = Math.round(days / 30);
+			const years = Math.round(months / 12);
+
+			if (seconds < 60) {
+				return `${seconds} seconds ago`;
+			} else if (minutes < 60) {
+				return `${minutes} minutes ago`;
+			} else if (hours < 24) {
+				return `${hours} hours ago`;
+			} else if (days < 30) {
+				return `${days} days ago`;
+			} else if (months < 12) {
+				return `${months} months ago`;
+			} else {
+				return `${years} years ago`;
+			}
 		},
 	},
 };
@@ -70,6 +103,8 @@ export default {
 	width: 50px;
 	height: 50px;
 	border-radius: 50%;
+	border: 1px solid black;
+	object-fit: cover;
 }
 
 .top-right {
@@ -89,6 +124,6 @@ export default {
 }
 
 .rating-info {
-    font-size: xx-small;
+	font-size: xx-small;
 }
 </style>

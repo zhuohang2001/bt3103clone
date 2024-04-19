@@ -23,19 +23,32 @@
 
 <script>
 import firebaseApp from "../firebase.js";
-import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import {
+	getFirestore,
+	doc,
+	getDoc,
+	collection,
+	addDoc,
+} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
 
 export default {
 	name: "LeaveRating",
 	data() {
 		return {
-			ratedUsername: "wxy", //kiv
-			ratedByUsername: "Betty", //kiv
+			ratedUserID: "",
+			ratedByUserID: "",
 			selectedRating: 0,
 			ratingComment: "",
+			ratingType: "",
+			ratingDate: null,
+			listingUser: "",
+			offerUser: "",
 		};
+	},
+	props: {
+		listingUser: String,
+		offerUser: String,
 	},
 	methods: {
 		setRating(value) {
@@ -52,13 +65,29 @@ export default {
 				}
 			});
 		},
+		determineRatingType() {
+			if (this.$store.state.user.uid === this.listingUser) {
+				this.ratedUserID = this.offerUser;
+				this.ratingType = "Shopper";
+			} else if (this.$store.state.user.uid === this.offerUser) {
+				this.ratedUserID = this.listingUser;
+				this.ratingType = "Traveller";
+			} else {
+				console.log("ERROOROROROROOR");
+			}
+		},
 		async leaveRating() {
+			await this.determineRatingType();
+			const ratedByUsername = await this.fetchUsername(this.$root.user.uid);
 			try {
 				const docRef = await addDoc(collection(db, "Ratings"), {
-					RatedUsername: this.ratedUsername,
-					RatedByUsername: this.ratedByUsername,
+					RatedUserID: this.ratedUserID,
+					RatedByUserID: this.$root.user.uid,
+					RatedByUsername: ratedByUsername,
 					RatingValue: this.selectedRating,
 					RatingComment: this.ratingComment,
+					RatingType: this.ratingType,
+					RatingDate: new Date().toISOString(),
 				});
 				console.log("Document written with ID: ", docRef.id);
 				this.selectedRating = 0;
@@ -67,6 +96,21 @@ export default {
 				this.$router.push("/home");
 			} catch (error) {
 				console.error("Error adding document: ", error);
+			}
+		},
+		async fetchUsername(userID) {
+			if (!userID) return "";
+			const userDocRef = doc(db, "Users", userID);
+			try {
+				const userDocSnapshot = await getDoc(userDocRef);
+				if (userDocSnapshot.exists()) {
+					const userData = userDocSnapshot.data();
+					return userData.username;
+				}
+				return "";
+			} catch (error) {
+				console.error("Error fetching username:", error);
+				return "";
 			}
 		},
 	},

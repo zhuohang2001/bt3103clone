@@ -1,4 +1,4 @@
-import { createStore } from "vuex";
+/* import { createStore } from "vuex";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -81,4 +81,25 @@ export default createStore({
 			}
 		},
 	},
-});
+}); */
+
+import { createStore } from 'vuex'
+import createPersistedState from "vuex-persistedstate";
+
+export default createStore({
+	state: {
+		user: null, // This will hold the logged-in user state
+	},
+	mutations: {
+		setUser(state, user) {
+			console.log("user setting")
+			console.log(user)
+			state.user = user;
+		},
+	},
+	actions: {
+		fetchUser({ commit }, user) {
+			commit('setUser', user);
+		},
+	},
+})
