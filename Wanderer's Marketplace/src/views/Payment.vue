@@ -162,6 +162,7 @@ export default {
 			},
 			body: JSON.stringify({
 			priceId: priceId,  // Use the price ID from earlier
+			offerId: offerId, 
 			}),
 		});
 

@@ -2,6 +2,9 @@ import { createStore } from "vuex";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import createPersistedState from 'vuex-persistedstate';
+
+
 const db = getFirestore();
 const storage = getStorage();
 
@@ -13,6 +16,9 @@ export default createStore({
 			profilePhoto: "",
 		},
 	},
+	plugins: [createPersistedState({
+		paths: ['user', 'currentListing', 'userProfile'], // Specify which parts of the state you want to persist
+	  })],
 	mutations: {
 		setUser(state, user) {
 			console.log("user setting");

@@ -15,6 +15,7 @@ import ListingOfferAction from "@/views/ListingOfferAction.vue";
 import Payment from "@/views/Payment.vue";
 import ListingConfirmDeliveryAction from "@/views/ListingConfirmDeliveryAction.vue";
 import ListingConfirmPurchaseAction from "@/views/ListingConfirmPurchaseAction.vue";
+import PaymentSuccess from "../views/PaymentSuccess.vue";
 
 
 const routes = [
@@ -97,7 +98,13 @@ const routes = [
 		path: "/listingconfirmpurchaseaction",
 		name: "ListingConfirmPurchaseAction",
 		component: ListingConfirmPurchaseAction,
-	}
+	},
+	{
+		path: '/payment-success',
+		name: 'PaymentSuccess',
+		component: PaymentSuccess,
+		props: true
+	  }
    
 ];
 

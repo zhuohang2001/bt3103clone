@@ -36,7 +36,7 @@ app.post('/create-price', async (req, res) => {
 
 app.post('/create-checkout-session', async (req, res) => {
     try {
-      const { priceId } = req.body;  // Assume a price ID is passed from the client
+      const { priceId, offerId } = req.body;   // Assume a price ID is passed from the client
       console.log('Received priceId:', priceId);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -45,7 +45,7 @@ app.post('/create-checkout-session', async (req, res) => {
           quantity: 1,
         }],
         mode: 'payment',
-        success_url: 'https://example.com/success',  // Replace with your success URL
+        success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}&offerId=${offerId}`,  // Replace with your success URL
         cancel_url: 'https://example.com/cancel',    // Replace with your cancel URL
       });
   

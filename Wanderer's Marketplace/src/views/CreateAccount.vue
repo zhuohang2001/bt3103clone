@@ -103,6 +103,16 @@
 					v-model="telegramHandle"
 				/>
 			</div>
+			<div class="form-group">
+				<label for="stripeUserId">Stripe User Id</label>
+				<input
+					type="text"
+					id="stripeUserId"
+					name="stripeUserId"
+					class="input-field"
+					v-model="stripeUserId"
+				/>
+			</div>
 			<button class="createaccount-button" @click="signUp($event)">
 				Create Account
 			</button>
@@ -154,6 +164,7 @@ export default {
 			error: "",
 			user: null,
 			defaultPhotoURL: "",
+			stripeUserId: ""
 		};
 	},
 	computed: {
@@ -244,6 +255,9 @@ export default {
 				if (!this.telegramHandle || this.telegramHandle.trim() === "") {
 					throw new Error("Please provide a valid Telegram handle.");
 				}
+				if (!this.stripeUserId || this.stripeUserId.trim() === "") {
+					throw new Error("Please provide a valid Stripe User Id.");
+				}
 				// Call the Firebase createUserWithEmailAndPassword method to create a new user
 				const auth = getAuth();
 				const { user } = await createUserWithEmailAndPassword(
@@ -269,6 +283,7 @@ export default {
 					expiryDate: this.expiryDate,
 					telegramHandle: this.telegramHandle,
 					profilePhoto: this.defaultPhotoURL,
+					stripeUserId: this.stripeUserId
 				});
 				// If account creation is successful, redirect to home or login page
 				this.$router.push("/");

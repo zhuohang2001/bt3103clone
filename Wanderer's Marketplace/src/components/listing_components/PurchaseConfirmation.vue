@@ -10,9 +10,9 @@
                   <!-- Hidden file input, triggered by label click -->
                   <input type="file" id="file-upload" @change="handleFileChange" accept="image/*" hidden />
                   <!-- Icon or image goes here -->
-                  <img v-if="!this.receiptImageUrl" src="/icons/favicon_io/document icon.png" alt="Document Icon" class="document-icon">
+                  <img v-if="!receiptImageUrl" src="/icons/favicon_io/document icon.png"  alt="Document Icon" class="document-icon">
                   <!-- Display uploaded image if available -->
-                  <img v-if="this.receiptImageUrl" :src="this.receiptImageUrl" alt="Uploaded receipt image" class="uploaded-receipt">
+                  <img v-if="receiptImageUrl" :src="receiptImageUrl" @load="imageLoaded" alt="Uploaded receipt image" class="uploaded-receipt">
               </div>
           </div>
           <div class="confirmation-text">
@@ -46,6 +46,7 @@ export default {
   data() {
     return {
       // ... other data properties
+      receiptImageUrl: null,
       offer: null, // Placeholder for the current offer object
     };
   },
@@ -66,6 +67,9 @@ export default {
   methods: {
     // Method to retrieve the current offer from state
 
+    imageLoaded() {
+      console.log('Image has loaded!');
+    },
     async getOffer() {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -121,7 +125,7 @@ export default {
         });
         this.$emit('confirmedPurchase', this.listing);
         // this.$router.push('/home');
-        console.log('Offer updated with image URL');
+        console.log('Offer updated with image URL', this.receiptImageUrl);
       } catch (error) {
         console.error("Error updating offer with image:", error);
       }
