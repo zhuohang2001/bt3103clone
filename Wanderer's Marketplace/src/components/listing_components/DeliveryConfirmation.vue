@@ -20,6 +20,9 @@
   import { mapState } from 'vuex';
   import firebaseApp from '../../firebase.js';
   import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+  import { onAuthStateChanged, getAuth } from "firebase/auth";
+  const db = getFirestore(firebaseApp);
+
   export default {
     name: 'DeliveryConfirmation',
     computed: {
@@ -32,22 +35,69 @@
     data () {
       return {
         listing: {},
+        offer: null
       };
     },
     created() {
       this.fetchData();
+      this.getOffer();
     },
     //props: {
     //    listingID: String
     //},
     methods: {
+      async getOffer() {
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (user) {
+          const db = getFirestore(firebaseApp);
+          const offersRef = collection(db, "Offers"); //check
+          console.log("listing_id", this.$store.state.currentListing.id)
+          const q = query(
+            offersRef,
+            where("ListingID", "==", this.$store.state.currentListing.id), //check
+            where("OfferStatus", "==", "Accepted")
+          );
+
+          try {
+            const querySnapshot = await getDocs(q);
+            const offers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            // Assuming that there will be only one offer matching the criteria
+            this.offer = offers.length > 0 ? offers[0] : null;
+            if (this.offer) {
+              console.log("Offer found: ", this.offer);
+            } else {
+              console.error("No matching offer found");
+            }
+          } catch (error) {
+            console.error("Error getting offers: ", error);
+          }
+        } else {
+          console.error("User is not authenticated");
+        }
+      },
       async confirmDelivery() {
         // Emit an event or call a method to handle the confirmation logic
-        const offerPrice = this.listing.OfferPrice;
-        const sellerStripeAccountId = 'acct_xxx'; // Retrieve the connected account ID from your database
-
+        console.log(this.offer)
+        const offerPrice = this.offer.OfferPrice;
+        const offerUserId = this.offer.OfferByUserID;
+        console.log("offerby user id", offerUserId)
+        const userDocRef = doc(db, "Users", offerUserId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+          console.error("No user document found!");
+          return;
+        }
+        
+        // Retrieve the seller's Stripe account ID
+        const sellerStripeAccountId = userDocSnap.data().stripeUserId;
+        if (!sellerStripeAccountId) {
+          console.error("Seller's Stripe account ID not found!");
+          return;
+        }
         try {
-          const response = await fetch('/payout-seller', {
+          const response = await fetch('http://localhost:3000/payout-seller', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -66,6 +116,7 @@
           }
         } catch (error) {
           console.error('Error in confirming delivery:', error);
+          return
         }
 
         const listingDocRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
@@ -86,24 +137,24 @@
         } else {
           console.error("No listing ID provided");
         }
+      },
+      async fetchListing() {
+        try {
+          const docRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists() && docSnap.data()) {
+              this.listing = {
+              ...docSnap.data(),
+              id: docRef.id // Add the document ID to the listing object
+              };
+          } else {
+              console.error("No such listing!");
+          }
+          } catch (error) {
+          console.error("Error fetching listing:", error);
+          }
       }
-    },
-    async fetchListing() {
-      try {
-        const docRef = doc(getFirestore(firebaseApp), "Listings", this.listingId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data()) {
-            this.listing = {
-            ...docSnap.data(),
-            id: docRef.id // Add the document ID to the listing object
-            };
-        } else {
-            console.error("No such listing!");
-        }
-        } catch (error) {
-        console.error("Error fetching listing:", error);
-        }
-    }
+  },
   };
 </script>
   

@@ -141,19 +141,6 @@ export default {
 		// Here you would have your logic to process the payment
 		const priceId = await this.createStripePrice();
 		const offerId = this.$route.params.offerId;
-		// const stripe = await this.stripePromise;
-		// const { error } = await stripe.redirectToCheckout({
-		// 	lineItems: [{
-		// 	price: priceId, // Replace with the price ID generated in your Stripe dashboard
-		// 	quantity: 1,
-		// 	}],
-		// 	mode: 'payment',
-		// 	successUrl: this.stripeOptions.successUrl,
-		// 	cancelUrl: this.stripeOptions.cancelUrl,
-		// });
-		// if (error) {
-		// 	console.error("Stripe error:", error);
-		// }
 
 		const response = await fetch('http://localhost:3000/create-checkout-session', {
 			method: 'POST',
