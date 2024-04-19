@@ -1,11 +1,52 @@
 <template>
 	<div :class="['profile-photo-container', containerClass]">
-		<img :src="profilePhoto" alt="Profile Photo" class="profile-photo" />
+		<img
+			:src="profilePhoto"
+			alt="Profile Photo"
+			class="profile-photo"
+			:style="styleObject"
+		/>
 	</div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import firebaseApp from "../../firebase.js";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+const db = getFirestore(firebaseApp);
+
+export default {
+	props: {
+		userID: String,
+		styleObject: Object,
+	},
+	data() {
+		return {
+			profilePhoto: "",
+		};
+	},
+	methods: {
+		async fetchProfilePhoto() {
+			if (!this.userID) return;
+			const userDocRef = doc(db, "Users", this.userID);
+			try {
+				const userDocSnapshot = await getDoc(userDocRef);
+				if (userDocSnapshot.exists()) {
+					const userData = userDocSnapshot.data();
+					this.profilePhoto = userData.profilePhoto;
+				}
+			} catch (error) {
+				console.error("Error fetching profile photo:", error);
+			}
+		},
+	},
+	watch: {
+		userID: {
+			immediate: true,
+			handler: "fetchProfilePhoto",
+		},
+	},
+};
+/* import { mapState } from "vuex";
 
 export default {
 	props: {
@@ -24,7 +65,7 @@ export default {
 			this.$store.dispatch("fetchUserProfile");
 		}
 	},
-};
+}; */
 
 /* import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";

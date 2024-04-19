@@ -14,7 +14,7 @@
 				<router-link to="/home"> Home </router-link> |
 				<router-link to="/marketplace"> Marketplace </router-link> |
 				<router-link to="/profile"> Profile </router-link>
-				<ProfilePhoto container-class="nav-profile-photo" />
+				<ProfilePhoto :userID="this.user.uid" :styleObject="{ width: '50px', height: '50px' }" />
 			</div>
 		</div>
 		<div
@@ -129,8 +129,4 @@ body {
 	margin: 0;
 }
 
-.nav-profile-photo .profile-photo {
-	width: 50px;
-	height: 50px;
-}
 </style>

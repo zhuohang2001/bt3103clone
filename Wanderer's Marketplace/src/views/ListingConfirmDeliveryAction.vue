@@ -108,5 +108,4 @@ h1 {
 	width: 100%; /* Ensure the container takes full width */
 }
 
-
 </style>
