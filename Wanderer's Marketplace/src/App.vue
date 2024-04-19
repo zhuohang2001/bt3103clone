@@ -103,6 +103,7 @@ export default {
 	position: fixed;
 	top: 0;
 	width: calc(100% - 20px);
+	z-index: 1000000; /* very high number */
 }
 
 #nav-links {
