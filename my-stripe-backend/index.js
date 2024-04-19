@@ -74,5 +74,31 @@ app.post('/create-checkout-session', async (req, res) => {
     }
   });
 
+  app.post('/create-stripe-account', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+
+    try {
+        const account = await stripe.accounts.create({
+            type: 'custom',
+            country: 'SG',  // Specify the country code
+            email: email,
+            capabilities: {
+                card_payments: { requested: true },
+                transfers: { requested: true },
+            },
+            // Additional settings can be added here as needed, such as business type or tos acceptance
+        });
+
+        return res.json({ accountId: account.id });
+    } catch (error) {
+        console.error('Error creating Stripe account:', error);
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
