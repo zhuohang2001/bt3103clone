@@ -5,8 +5,9 @@
         <div class="proof-purchase">
             <div class="proof-text"><b>Proof of Purchase</b></div>
           <div class="document-container">
-            <!-- Icon or image goes here -->
-            <img src = "/icons/favicon_io/document icon.png" alt = "Document Icon" class = "document-icon">
+            <!-- Icon or image goes here 
+            <img src = "/icons/favicon_io/document icon.png" alt = "Document Icon" class = "document-icon"> -->
+            <img v-if="offer && offer.purchaseProofImage" :src="offer.purchaseProofImage" alt="Purchase Proof Image" class="purchase-proof-image">
           </div>
         </div>
         <div class="confirmation-text">
@@ -173,6 +174,11 @@
     border-radius: 10px;
     height: auto;
     color: black;
+  }
+  .purchase-proof-image{
+    margin-top: 10px;
+    max-width: 400px;
+    max-height: 400px;
   }
   .confirm-btn{
     padding: 10px 20px;

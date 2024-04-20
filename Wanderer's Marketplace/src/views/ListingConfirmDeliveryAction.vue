@@ -102,6 +102,7 @@ h1 {
 	position: relative;
 }
 
+
 .buttons-container {
 	display: flex;
 	justify-content: space-evenly; /* This will space out your buttons evenly */

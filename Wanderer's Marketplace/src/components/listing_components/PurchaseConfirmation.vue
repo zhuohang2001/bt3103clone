@@ -161,9 +161,9 @@ export default {
   <style scoped>
   .confirmation-card {
     background-color: #ffffff;
-	border-radius: 20px;
-	padding: 1rem;
-	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
   }
   .document-container {
     display: flex;
@@ -174,6 +174,7 @@ export default {
   .proof-purchase{
     background-color: #fff1e7;
     padding: 1rem;
+    padding-bottom: 4rem;
     border-radius: 10px;
     height: auto;
   }

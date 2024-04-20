@@ -40,7 +40,8 @@ export default {
       const db = getFirestore();
       const q = query(
         collection(db, 'Offers'),
-        where('ListingID', '==', this.listingId)
+        where('ListingID', '==', this.listingId),
+        where("OfferStatus", "==", "Accepted")
       );
 
       try {
