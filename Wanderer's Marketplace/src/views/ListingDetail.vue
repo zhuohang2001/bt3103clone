@@ -58,7 +58,7 @@
 				</button>
 				<button
 					v-if="hasPendingOffer && productDetails.listingStatus === 'Available'"
-					class="action-button"
+					class="action-button pending-offer"
 					disabled
 				>
 					Pending Offer
@@ -395,6 +395,17 @@ export default {
 </script>
 
 <style scoped>
+.action-button.pending-offer {
+  background-color: #a9a9a9; /* Replace with the exact color from the screenshot */
+  color: #000; /* Adjust if your button text color is different */
+  border: 1px solid #a9a9a9; /* Use the same color for a solid button look or different for border */
+}
+
+.action-button.pending-offer:hover {
+  background-color: #a9a9a9; /* Darker color for hover effect, adjust as needed */
+  border-color: #a9a9a9; /* Border color change on hover, adjust as needed */
+}
+
 .product-details-container {
 	display: flex;
 	justify-content: center;
