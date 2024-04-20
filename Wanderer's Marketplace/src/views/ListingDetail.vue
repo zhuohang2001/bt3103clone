@@ -1,6 +1,16 @@
 <template>
 	<div class="product-name-header">
 		<h1>{{ productDetails.name }}</h1>
+		<div class="listing-user-details">
+			<a
+				:href="`tg://resolve?domain=${listingUser.telegramHandle}`"
+				target="_blank"
+			>
+				@{{ this.listingUser.username }} | Telegram @{{
+					this.listingUser.telegramHandle
+				}}
+			</a>
+		</div>
 	</div>
 	<div class="product-details-container">
 		<div class="left">
@@ -35,10 +45,16 @@
 				</div>
 			</div>
 			<div class="buttons-container">
-				<button v-if="productDetails.listingStatus === 'Available' && !hasPendingOffer && this.productDetails.userID != user.uid"
-                        class="action-button"
-                        @click="extendOffer">
-                    Extend Offer
+				<button
+					v-if="
+						productDetails.listingStatus === 'Available' &&
+						!hasPendingOffer &&
+						this.productDetails.userID != user.uid
+					"
+					class="action-button"
+					@click="extendOffer"
+				>
+					Extend Offer
 				</button>
 				<button
 					v-if="hasPendingOffer && productDetails.listingStatus === 'Available'"
@@ -48,14 +64,20 @@
 					Pending Offer
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Accepted' && this.productDetails.userID != user.uid"
+					v-if="
+						productDetails.listingStatus === 'Accepted' &&
+						this.productDetails.userID != user.uid
+					"
 					class="action-button"
 					@click="confirmPurchase"
 				>
 					Confirm Purchase
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Purchased' && this.productDetails.userID == user.uid"
+					v-if="
+						productDetails.listingStatus === 'Purchased' &&
+						this.productDetails.userID == user.uid
+					"
 					class="action-button"
 					@click="confirmDelivery"
 				>
@@ -68,13 +90,21 @@
 				>
 					Leave Rating
 				</button>
-				<button v-if="productDetails.listingStatus === 'Available' && this.productDetails.userID == user.uid"
-                        class="action-button"
-                        @click="viewOffers">
-                    View Offers
+				<button
+					v-if="
+						productDetails.listingStatus === 'Available' &&
+						this.productDetails.userID == user.uid
+					"
+					class="action-button"
+					@click="viewOffers"
+				>
+					View Offers
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Available' && this.productDetails.userID == user.uid"
+					v-if="
+						productDetails.listingStatus === 'Available' &&
+						this.productDetails.userID == user.uid
+					"
 					class="action-button"
 					@click="deleteListing"
 				>
@@ -104,6 +134,7 @@ export default {
 			hasPendingOffer: false, // This will track whether a pending offer exists
 			acceptedOffer: null,
 			offerUser: null,
+			listingUser: null,
 		};
 	},
 	watch: {
@@ -124,6 +155,7 @@ export default {
 		},
 	},
 	created() {
+		this.fetchListingUser(this.productDetails.userID);
 		this.checkForExistingOffer();
 	},
 	mounted() {
@@ -149,8 +181,7 @@ export default {
 					listingStatus: "Available",
 					userID: "",
 				}
-				
-			)
+			);
 		},
 		acceptedOfferDetails() {
 			if (!this.acceptedOffer || !this.offerUser) {
@@ -167,14 +198,16 @@ export default {
 			};
 		},
 		isCurrentUserTheLister() {
-			console.log('Current user:', this.user.uid);
-			console.log('Listing user:', this.productDetails.userID);
-			return this.user && this.productDetails && this.user.uid === this.productDetails.userID;
+			console.log("Current user:", this.user.uid);
+			console.log("Listing user:", this.productDetails.userID);
+			return (
+				this.user &&
+				this.productDetails &&
+				this.user.uid === this.productDetails.userID
+			);
 		},
 		isTraveller() {
-			return (
-				this.user.uid === this.productDetails.UserID
-			);
+			return this.user.uid === this.productDetails.UserID;
 		},
 
 		buttonConfig() {
@@ -217,7 +250,7 @@ export default {
 				.push({
 					name: "LeaveRating",
 					params: {
-						listingUser: this.productDetails.UserID,
+						listingUser: this.productDetails.UserID, // kiv
 						offerUser: this.acceptedOffer.OfferByUserID,
 					},
 				})
@@ -310,6 +343,21 @@ export default {
 			}
 		},
 
+		async fetchListingUser(userID) {
+			try {
+				const userRef = doc(db, "Users", userID);
+				const userSnap = await getDoc(userRef);
+
+				if (userSnap.exists()) {
+					this.listingUser = userSnap.data();
+				} else {
+					console.error("No listing user found for ID:", userID);
+				}
+			} catch (error) {
+				console.error("Error fetching listing user:", error);
+			}
+		},
+
 		// You can define other actions for different states here
 		async checkForExistingOffer() {
 			try {
@@ -355,8 +403,19 @@ export default {
 }
 
 .product-name-header {
-	text-align: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin-top: 20px;
+	padding: 20px 50px 0px 50px;
+}
+
+.product-name-header h1 {
+	margin: 0;
+}
+
+.product-name-header a {
+	color: inherit;
 }
 
 .left,
@@ -430,7 +489,6 @@ export default {
 	cursor: pointer;
 	margin-top: 10px;
 	margin-left: 10px;
-
 }
 
 .telegram-detail-box {
