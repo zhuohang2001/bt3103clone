@@ -14,7 +14,11 @@
 				<router-link to="/home"> Home </router-link> |
 				<router-link to="/marketplace"> Marketplace </router-link> |
 				<router-link to="/profile"> Profile </router-link>
-				<ProfilePhoto :userID="this.user.uid" :styleObject="{ width: '50px', height: '50px' }" />
+				<router-link to="/profile"
+					><ProfilePhoto
+						:userID="this.user.uid"
+						:styleObject="{ width: '50px', height: '50px' }"
+				/></router-link>
 			</div>
 		</div>
 		<div
@@ -129,5 +133,4 @@ export default {
 body {
 	margin: 0;
 }
-
 </style>
