@@ -35,14 +35,10 @@
 				</div>
 			</div>
 			<div class="buttons-container">
-				<button
-					v-if="
-						productDetails.listingStatus === 'Available' && !hasPendingOffer
-					"
-					class="action-button"
-					@click="extendOffer"
-				>
-					Extend Offer
+				<button v-if="productDetails.listingStatus === 'Available' && !hasPendingOffer && this.productDetails.userID != user.uid"
+                        class="action-button"
+                        @click="extendOffer">
+                    Extend Offer
 				</button>
 				<button
 					v-if="hasPendingOffer && productDetails.listingStatus === 'Available'"
@@ -72,15 +68,13 @@
 				>
 					Leave Rating
 				</button>
-				<button
-					v-if="productDetails.listingStatus === 'Available'"
-					class="action-button"
-					@click="viewOffers"
-				>
-					View Offers
+				<button v-if="productDetails.listingStatus === 'Available' && this.productDetails.userID == user.uid"
+                        class="action-button"
+                        @click="viewOffers">
+                    View Offers
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Available'"
+					v-if="productDetails.listingStatus === 'Available' && this.productDetails.userID == user.uid"
 					class="action-button"
 					@click="deleteListing"
 				>
@@ -153,8 +147,10 @@ export default {
 					deliveryDate: "",
 					country: "",
 					listingStatus: "Available",
+					userID: "",
 				}
-			);
+				
+			)
 		},
 		acceptedOfferDetails() {
 			if (!this.acceptedOffer || !this.offerUser) {
@@ -171,10 +167,12 @@ export default {
 			};
 		},
 		isCurrentUserTheLister() {
-			// Ensure the user object is defined before accessing its properties
+			console.log('Current user:', this.user.uid);
+			console.log('Listing user:', this.productDetails.userID);
+			return this.user && this.productDetails && this.user.uid === this.productDetails.userID;
+		},
+		isTraveller() {
 			return (
-				this.user &&
-				this.productDetails &&
 				this.user.uid === this.productDetails.UserID
 			);
 		},
@@ -431,6 +429,8 @@ export default {
 	color: #fff;
 	cursor: pointer;
 	margin-top: 10px;
+	margin-left: 10px;
+
 }
 
 .telegram-detail-box {
