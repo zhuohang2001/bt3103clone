@@ -94,6 +94,7 @@ export default {
 				this.ratingComment = "";
 				this.$emit("added");
 				this.$router.push("/home");
+				alert("You have successfully left a rating.");
 			} catch (error) {
 				console.error("Error adding document: ", error);
 			}
@@ -132,6 +133,16 @@ export default {
 input {
 	width: 100%;
 	height: 100px;
+	margin-top: 10px;
+}
+
+button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 30px;
+	background-color: #051e55;
+	color: #fff;
+	cursor: pointer;
 	margin-top: 10px;
 }
 </style>

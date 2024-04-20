@@ -310,8 +310,18 @@ export default {
 
 		async uploadCroppedImage(file) {
 			try {
-				await this.$store.dispatch("uploadProfilePhoto", file);
-				console.log(file);
+				const storageRef = ref(
+					storage,
+					`profile-photos/${this.$root.user.uid}/${file.name}`
+				);
+				const uploadTask = await uploadBytes(storageRef, file);
+				const downloadURL = await getDownloadURL(uploadTask.ref);
+
+				await updateDoc(doc(db, "Users", this.$root.user.uid), {
+					profilePhoto: downloadURL,
+				});
+				console.log("File uploaded successfully:", downloadURL);
+				alert("Your profile photo has been updated successfully.");
 			} catch (error) {
 				console.error("Error uploading file:", error);
 			}
