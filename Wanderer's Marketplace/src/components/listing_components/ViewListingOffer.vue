@@ -7,15 +7,19 @@
           <h2 class="listing-title">{{ listing.title }}</h2>
           <p class="listing-status">{{ listing.status }}</p>
         </div>
-        <div class="offers-container">
-          <div 
-      v-for="offer in offers" :key="offer.id" :class="{'offer-card': true, 'selected': selectedOffer && offer.id === selectedOffer.id}" @click="selectOffer(offer)">
+        <!-- Check if offers array has elements -->
+        <div v-if="offers.length > 0" class="offers-container">
+          <div v-for="offer in offers" :key="offer.id" :class="{'offer-card': true, 'selected': selectedOffer && offer.id === selectedOffer.id}" @click="selectOffer(offer)">
             <img :src="getUserImageUrl(offer.OfferByUserID)" alt="User Image" class="user-image" />
             <div class="offer-info">
               <p class="user-name">{{ getUserName(offer.OfferByUserID) }}</p>
               <p class="offer-price">Offered: ${{ offer.OfferPrice }}</p>
             </div>
           </div>
+        </div>
+        <!-- Display message when there are no offers -->
+        <div v-else class="no-offers-message">
+          No Offers listed yet.
         </div>
       </div>
       <div v-if="selectedOffer" class="selected-offer-details">
@@ -320,7 +324,14 @@
 }
 
 .offer-card.selected {
-    background-color: #007bff; /* Bootstrap primary blue color */
-    color: white; /* Change text color to white for better readability */
+  background-color: #007bff; 
+    color: white; 
+  }
+
+  .no-offers-message {
+    text-align: center;
+    font-size: 35px;
+    color: #c1271f;
+    font-weight: bold;
   }
 </style>
