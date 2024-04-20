@@ -67,10 +67,16 @@
                 const listingIdsWithUserOffers = offersSnapshot.docs.map(doc => doc.data().ListingID);
 
                 // Now, get all listings where the current user has made an offer and the status is "Accepted"
+                // let q = query(
+                // collection(db, 'Listings'),
+                // where('ListingStatus', '==', 'Accepted'), // Filter listings with "Accepted" status
+                // where(documentId(), 'in', listingIdsWithUserOffers) // Listings should be in the user's offers
+                // );
+
                 let q = query(
-                collection(db, 'Listings'),
-                where('ListingStatus', '==', 'Accepted'), // Filter listings with "Accepted" status
-                where(documentId(), 'in', listingIdsWithUserOffers) // Listings should be in the user's offers
+                    collection(db, 'Listings'),
+                    where('ListingStatus', 'in', ['Accepted', 'Purchased', 'Completed']), // Adjusted for multiple statuses
+                    where(documentId(), 'in', listingIdsWithUserOffers)
                 );
                 const querySnapshot = await getDocs(q);
 
