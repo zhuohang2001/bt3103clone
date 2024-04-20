@@ -48,14 +48,14 @@
 					Pending Offer
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Accepted'"
+					v-if="productDetails.listingStatus === 'Accepted' && this.productDetails.userID != user.uid"
 					class="action-button"
 					@click="confirmPurchase"
 				>
 					Confirm Purchase
 				</button>
 				<button
-					v-if="productDetails.listingStatus === 'Purchased'"
+					v-if="productDetails.listingStatus === 'Purchased' && this.productDetails.userID == user.uid"
 					class="action-button"
 					@click="confirmDelivery"
 				>
