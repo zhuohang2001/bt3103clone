@@ -21,7 +21,7 @@
           <div class="confirmation-text">
               I confirm that I have purchased <br> authentic products as requested.
           </div>
-          <button class="confirm-btn" @click="confirmPurchase">Update as Purchased</button>   
+          <button class="confirm-btn" @click="confirmPurchase" :disabled="!receiptImageUrl">Update as Purchased</button>   
       </div>
   </div>
 </template>

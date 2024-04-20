@@ -9,33 +9,10 @@
       </button>
     </div>
 
-    <!-- Category select -->
-    <div class="filter-item">
-      <label class="filter-label">Category</label>
-      <div class="filter-options">
-        <button
-          class="filter-option"
-          :class="{ 'active': category === 'Electronics' }"
-          @click="category = 'Electronics'">Electronics</button>
-        <button
-          class="filter-option"
-          :class="{ 'active': category === 'Beauty' }"
-          @click="category = 'Beauty'">Beauty</button>
-        <button
-          class="filter-option"
-          :class="{ 'active': category === 'Consumables' }"
-          @click="category = 'Consumables'">Consumables</button>
-      </div>
-    </div>
-
     <!-- Sort select -->
     <div class="filter-item">
       <label class="filter-label">Sort By</label>
       <div class="filter-options">
-        <button
-          class="filter-option"
-          :class="{ 'active': sort === 'Popularity' }"
-          @click="sort = 'Popularity'">Popularity</button>
         <button
           class="filter-option"
           :class="{ 'active': sort === 'Newest' }"

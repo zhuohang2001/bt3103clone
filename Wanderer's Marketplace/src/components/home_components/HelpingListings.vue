@@ -66,43 +66,48 @@
                 const offersSnapshot = await getDocs(offersQuery);
                 const listingIdsWithUserOffers = offersSnapshot.docs.map(doc => doc.data().ListingID);
 
-                // Now, get all listings where the current user has made an offer and the status is "Accepted"
-                // let q = query(
-                // collection(db, 'Listings'),
-                // where('ListingStatus', '==', 'Accepted'), // Filter listings with "Accepted" status
-                // where(documentId(), 'in', listingIdsWithUserOffers) // Listings should be in the user's offers
-                // );
+                const chunkArray = (arr, size) =>
+                    Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+                        arr.slice(i * size, i * size + size)
+                    );
 
-                let q = query(
-                    collection(db, 'Listings'),
-                    where('ListingStatus', 'in', ['Accepted', 'Purchased', 'Completed']), // Adjusted for multiple statuses
-                    where(documentId(), 'in', listingIdsWithUserOffers)
-                );
-                const querySnapshot = await getDocs(q);
+                // Split the listing IDs into chunks of 30
+                const chunks = chunkArray(listingIdsWithUserOffers, 8);
+                let products = [];
 
-                this.products = querySnapshot.docs.map(doc => {
-                    const data = doc.data();
-                    return {
-                        id: doc.id,
-                        name: data.ProductName, // Make sure 'ProductName' matches the field in Firestore
-                        maxPrice: data.MaxProductPrice, // Same here for 'MaxProductPrice'
-                        date: data.DateCreation, // And for 'DateCreation'
-                        country: data.Country, // And for 'Country'
-                        imageUrl: data.ProductImage, // Ensure there is an image URL in the data
-            
-                        color: data.Colour,
-                        currency: data.Currency,
-                        deliveryFee: data.DeliveryFee,
-                        deliveryDate: data.EstimatedDeliveryDate,
-                        minPrice: data.MinProductPrice,
-                        listingStatus: data.ListingStatus,
-                        quantity: data.Quantity,
-                        size: data.Size,
-                        timeCreation: data.timeCreation, 
-                        userID: data.userID,
-                        status: data.ListingStatus
-                    };
-                });
+                for (var chunk of chunks) {
+                    let q = query(
+                        collection(db, 'Listings'),
+                        where('ListingStatus', 'in', ['Accepted', 'Purchased', 'Completed']),
+                        where(documentId(), 'in', chunk)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    const chunkProducts = querySnapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            name: data.ProductName,
+                            maxPrice: data.MaxProductPrice,
+                            date: data.DateCreation,
+                            country: data.Country,
+                            imageUrl: data.ProductImage,
+                            color: data.Colour,
+                            currency: data.Currency,
+                            deliveryFee: data.DeliveryFee,
+                            deliveryDate: data.EstimatedDeliveryDate,
+                            minPrice: data.MinProductPrice,
+                            listingStatus: data.ListingStatus,
+                            quantity: data.Quantity,
+                            size: data.Size,
+                            timeCreation: data.timeCreation,
+                            userID: data.userID,
+                            status: data.ListingStatus
+                        };
+                    });
+                    products = products.concat(chunkProducts);
+                }
+
+                this.products = products;
                 console.log(this.products)
                 console.log("showing products im helping to buy")
             } catch (error) {
