@@ -103,16 +103,6 @@
 						v-model="telegramHandle"
 					/>
 				</div>
-				<div class="form-group">
-					<label for="stripeUserId">Stripe User Id</label>
-					<input
-						type="text"
-						id="stripeUserId"
-						name="stripeUserId"
-						class="input-field"
-						v-model="stripeUserId"
-					/>
-				</div>
 				<button class="createaccount-button" @click="signUp($event)">
 					Create Account
 				</button>
@@ -262,10 +252,6 @@
 				event.preventDefault();
 				try {
 					// Check if the username is empty or contains only spaces
-					const accountId = await this.createStripeConnectedAccount();
-					const res = await this.generateStripeLink(accountId);
-					console.log("LOOK HERE", res)
-					window.location.href = res
 					if (!this.username || this.username.trim() === "") {
 						throw new Error("Please provide a valid username.");
 					}
@@ -316,10 +302,6 @@
 					if (!this.telegramHandle || this.telegramHandle.trim() === "") {
 						throw new Error("Please provide a valid Telegram handle.");
 					}
-					if (!this.stripeUserId || this.stripeUserId.trim() === "") {
-						throw new Error("Please provide a valid Stripe User Id.");
-					}
-					this.checkStripeAccountId(this.stripeUserId)
 					// Call the Firebase createUserWithEmailAndPassword method to create a new user
 					const auth = getAuth();
 					const { user } = await createUserWithEmailAndPassword(
@@ -333,6 +315,13 @@
 
 					// Show alert after verification email is sent
 					alert('Verification email sent! Please check your inbox and verify your email before logging in.');
+					const accountId = await this.createStripeConnectedAccount();
+					this.stripeUserId = accountId;
+					const res = await this.generateStripeLink(accountId);
+					if (!this.stripeUserId || this.stripeUserId.trim() === "") {
+						throw new Error("Please provide a valid Stripe User Id.");
+					}
+					this.checkStripeAccountId(this.stripeUserId)
 
 					// Save user details to Firestore
 					//const db = app.firestore();
@@ -348,7 +337,9 @@
 						stripeUserId: this.stripeUserId
 					});
 					// If account creation is successful, redirect to home or login page
-					this.$router.push("/");
+					window.location.href = res
+
+					// this.$router.push("/");
 				} catch (error) {
 					// Handle account creation errors here
 					if (error.code === "auth/invalid-email") {

@@ -138,8 +138,8 @@ app.post('/create-account-link', async (req, res) => {
     try {
       const accountLink = await stripe.accountLinks.create({
         account: accountId,
-        refresh_url: "http://localhost:5173/marketplace", // The URL to redirect the user if they are disconnected. 
-        return_url: "http://localhost:5173/home",   // The URL to redirect the user after they have completed the onboarding process.
+        refresh_url: "http://localhost:5173/home", // The URL to redirect the user if they are disconnected. 
+        return_url: "http://localhost:5173/",   // The URL to redirect the user after they have completed the onboarding process.
         type: 'account_onboarding',
       });
       
