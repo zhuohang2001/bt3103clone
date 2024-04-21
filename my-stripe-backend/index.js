@@ -83,9 +83,26 @@ app.post('/create-checkout-session', async (req, res) => {
 
     try {
         const account = await stripe.accounts.create({
-            type: 'custom',
+            type: 'express',
             country: 'SG',  // Specify the country code
             email: email,
+            business_type: "individual",
+            business_profile: {
+              url: 'https://canvas.nus.edu.sg',
+              product_description: 'College, Uni, Professional Schools', // This is an assumption. You may need to change the field according to Stripe's expected structure
+            //   industry:'College, Uni, Professional Schools'
+            },
+            // tos_acceptance: {
+            //     date: null,
+            //     ip: null,
+            //     user_agent: null
+            // },
+            company: {
+              // Add other company details that Stripe requires
+            },
+            individual: {
+              // Add individual representative's details that Stripe requires
+            },
             capabilities: {
                 card_payments: { requested: true },
                 transfers: { requested: true },
@@ -99,6 +116,38 @@ app.post('/create-checkout-session', async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 });
+app.get('/check-stripe-account/:accountId', async (req, res) => {
+    const accountId = req.params.accountId;
+    
+    try {
+      const account = await stripe.accounts.retrieve(accountId);
+      res.json({ isValid: true, account });
+    } catch (error) {
+      res.status(400).json({ isValid: false, error: error.message });
+    }
+  });
 
+app.post('/create-account-link', async (req, res) => {
+    const { accountId, refreshUrl, returnUrl } = req.body;
+  
+    if (!accountId) {
+      return res.status(400).json({ error: 'Account ID is required' });
+    }
+
+  
+    try {
+      const accountLink = await stripe.accountLinks.create({
+        account: accountId,
+        refresh_url: "http://localhost:5173/marketplace", // The URL to redirect the user if they are disconnected. 
+        return_url: "http://localhost:5173/home",   // The URL to redirect the user after they have completed the onboarding process.
+        type: 'account_onboarding',
+      });
+      
+      return res.json({ url: accountLink.url });
+    } catch (error) {
+      console.error('Error creating account link:', error);
+      return res.status(500).json({ error: error.message });
+    }
+  });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

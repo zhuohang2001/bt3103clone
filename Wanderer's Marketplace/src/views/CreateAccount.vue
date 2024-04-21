@@ -103,6 +103,16 @@
 						v-model="telegramHandle"
 					/>
 				</div>
+				<div class="form-group">
+					<label for="stripeUserId">Stripe User Id</label>
+					<input
+						type="text"
+						id="stripeUserId"
+						name="stripeUserId"
+						class="input-field"
+						v-model="stripeUserId"
+					/>
+				</div>
 				<button class="createaccount-button" @click="signUp($event)">
 					Create Account
 				</button>
@@ -187,7 +197,28 @@
 				});
 		},
 		methods: {
-			async createStripeAccount() {
+			async checkStripeAccountId(accountId) {
+				try {
+				// Replace 'http://backendserver.com' with the actual domain where your Node.js backend is hosted
+				const response = await fetch(`http://localhost:3000/check-stripe-account/${accountId}`, {method: 'GET',
+			headers: {
+			'Content-Type': 'application/json',
+},});
+				const data = await response.json();
+				
+				if (response.ok) {
+					console.log('Stripe account is valid:', data.account);
+					// Handle successful validation
+				} else {
+					console.error('Stripe account validation failed:', data.error);
+					// Handle validation failure
+				}
+				} catch (error) {
+				console.error('Error calling the API:', error);
+				// Handle network errors or other unexpected errors
+				}
+			},
+			async createStripeConnectedAccount() {
 				try {
 					const response = await fetch('http://localhost:3000/create-stripe-account', {
 						method: 'POST',
@@ -196,12 +227,30 @@
 					});
 					const data = await response.json();
 					if (response.ok) {
-						return data.stripeUserId;
+						return data.accountId;
 					} else {
 						throw new Error(data.error || 'Failed to create Stripe account');
 					}
 				} catch (error) {
 					console.error('Error creating Stripe account:', error.message);
+					throw error;  // Rethrow to handle it in signUp method
+				}
+			},
+			async generateStripeLink(accountId) {
+				try {
+					const response = await fetch('http://localhost:3000/create-account-link', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ accountId: accountId })
+					});
+					const data = await response.json();
+					if (response.ok) {
+						return data.url;
+					} else {
+						throw new Error(data.error || 'Failed to generate remediation link for account');
+					}
+				} catch (error) {
+					console.error('Error to generate stripe link:', error.message);
 					throw error;  // Rethrow to handle it in signUp method
 				}
 			},
@@ -213,7 +262,10 @@
 				event.preventDefault();
 				try {
 					// Check if the username is empty or contains only spaces
-					this.stripeUserId = await this.createStripeAccount();
+					const accountId = await this.createStripeConnectedAccount();
+					const res = await this.generateStripeLink(accountId);
+					console.log("LOOK HERE", res)
+					window.location.href = res
 					if (!this.username || this.username.trim() === "") {
 						throw new Error("Please provide a valid username.");
 					}
@@ -267,6 +319,7 @@
 					if (!this.stripeUserId || this.stripeUserId.trim() === "") {
 						throw new Error("Please provide a valid Stripe User Id.");
 					}
+					this.checkStripeAccountId(this.stripeUserId)
 					// Call the Firebase createUserWithEmailAndPassword method to create a new user
 					const auth = getAuth();
 					const { user } = await createUserWithEmailAndPassword(
