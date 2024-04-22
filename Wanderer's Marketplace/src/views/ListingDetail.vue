@@ -135,6 +135,7 @@ export default {
 			acceptedOffer: null,
 			offerUser: null,
 			listingUser: null,
+			offer: null,
 		};
 	},
 	watch: {
@@ -155,7 +156,7 @@ export default {
 		},
 	},
 	created() {
-		this.fetchListingUser(this.productDetails.userID);
+		this.fetchUserDetails(this.productDetails.userID);
 		this.checkForExistingOffer();
 	},
 	mounted() {
@@ -181,7 +182,8 @@ export default {
 					listingStatus: "Available",
 					userID: "",
 				}
-			);
+				
+			)
 		},
 		acceptedOfferDetails() {
 			if (!this.acceptedOffer || !this.offerUser) {
@@ -191,23 +193,32 @@ export default {
 					offerPrice: "Loading...",
 				};
 			}
-			return {
-				username: this.offerUser.username,
-				telegram: this.offerUser.telegramHandle,
-				offerPrice: this.acceptedOffer.OfferPrice,
-			};
+      if (this.user.uid === this.productDetails.userID) {
+		console.log("abccc", this.offerUser.username);
+        return {
+          username: this.offerUser.username,
+          telegram: this.offerUser.telegramHandle,
+          offerPrice: this.acceptedOffer.OfferPrice,
+        };
+      } else {
+		console.log("nnvvs", this.listingUser.username);
+        return {
+          username: this.listingUser.username,
+          telegram: this.listingUser.telegramHandle,
+          offerPrice: this.acceptedOffer.OfferPrice,
+
+        };
+	};
 		},
 		isCurrentUserTheLister() {
-			console.log("Current user:", this.user.uid);
-			console.log("Listing user:", this.productDetails.userID);
-			return (
-				this.user &&
-				this.productDetails &&
-				this.user.uid === this.productDetails.userID
-			);
+			console.log('Current user:', this.user.uid);
+			console.log('Listing user:', this.productDetails.userID);
+			return this.user && this.productDetails && this.user.uid === this.productDetails.userID;
 		},
 		isTraveller() {
-			return this.user.uid === this.productDetails.UserID;
+			return (
+				this.user.uid === this.productDetails.UserID
+			);
 		},
 
 		buttonConfig() {
@@ -250,7 +261,7 @@ export default {
 				.push({
 					name: "LeaveRating",
 					params: {
-						listingUser: this.productDetails.UserID, // kiv
+						listingUser: this.productDetails.UserID,
 						offerUser: this.acceptedOffer.OfferByUserID,
 					},
 				})
@@ -303,6 +314,7 @@ export default {
 		},
 
 		async fetchAcceptedOffer() {
+			console.log("productdetailsnifonv:", this.productDetails);
 			if (this.productDetails.listingStatus === "Accepted") {
 				try {
 					const offersRef = collection(db, "Offers");
@@ -310,12 +322,15 @@ export default {
 						offersRef,
 						where("ListingID", "==", this.productDetails.id)
 					);
+					console.log("products user id", this.productDetails.userID);
 
 					const querySnapshot = await getDocs(q);
 					if (!querySnapshot.empty) {
 						this.acceptedOffer = querySnapshot.docs[0].data();
-						console.log(this.acceptedOffer);
-						await this.fetchOfferUser(this.acceptedOffer.OfferByUserID);
+						console.log("acceptedOffer133", this.acceptedOffer);
+						const offerUserID = this.acceptedOffer.OfferByUserID;
+  						await this.fetchOfferUser(offerUserID);
+						await this.fetchUserDetails(this.productDetails.userID);
 					} else {
 						console.error("No accepted offers found for this listing.");
 						this.acceptedOffer = null;
@@ -325,6 +340,7 @@ export default {
 					this.acceptedOffer = null;
 				}
 			}
+			
 		},
 		async fetchOfferUser(userID) {
 			try {
@@ -333,6 +349,7 @@ export default {
 
 				if (userSnap.exists()) {
 					this.offerUser = userSnap.data();
+					console.log("thisistheofferuser:", this.offerUser);
 				} else {
 					console.error("No user found for ID:", userID);
 					this.offerUser = null;
@@ -343,21 +360,23 @@ export default {
 			}
 		},
 
-		async fetchListingUser(userID) {
+		async fetchUserDetails(userID) {
 			try {
 				const userRef = doc(db, "Users", userID);
 				const userSnap = await getDoc(userRef);
 
 				if (userSnap.exists()) {
 					this.listingUser = userSnap.data();
+					console.log("thisisthelistinguser:", this.listingUser);
 				} else {
-					console.error("No listing user found for ID:", userID);
+					console.error("No user found for ID:", userID);
+					this.listingUser = null;
 				}
 			} catch (error) {
-				console.error("Error fetching listing user:", error);
+				console.error("Error fetching user:", error);
+				this.listingUser = null;
 			}
 		},
-
 		// You can define other actions for different states here
 		async checkForExistingOffer() {
 			try {
@@ -372,16 +391,14 @@ export default {
 
 				const querySnapshot = await getDocs(q);
 				this.hasPendingOffer = !querySnapshot.empty;
-
-				// const querySnapshot = await getDocs(q);
 				// this.offer = querySnapshot.docs.map(doc => {
 				// const data = doc.data();
 				// return {
-				// 	OfferID: doc.OfferID,
-				// 	ListingID: doc.ListingID,
-				// 	OfferByUserID: doc.OfferByUserID,
-				// 	OfferPrice: doc.OfferPrice,
-				// 	OfferStatus: doc.OfferStatus
+				// 	OfferID: data.OfferID,
+				// 	ListingID: data.ListingID,
+				// 	OfferByUserID: data.OfferByUserID,
+				// 	OfferPrice: data.OfferPrice,
+				// 	OfferStatus: data.OfferStatus
 				// };
 				// })
 				console.log(this.offer);
@@ -417,6 +434,7 @@ export default {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	text-align: center;
 	margin-top: 20px;
 	padding: 20px 50px 0px 50px;
 }
@@ -458,18 +476,13 @@ export default {
 	display: flex;
 	align-items: center;
 	margin-left: 10px;
-	flex-grow: 0;
 	flex-shrink: 0;
 	height: 15px;
 }
 
 .accepted-offer-label {
-	background-color: #ffa500; /* Keep label background the same as the container */
-	border-radius: 10px;
-	padding: 10px;
-	color: white;
+	font-size: 16px;
 	font-weight: bold;
-	font-size: 18px;
 }
 
 .accepted-offer-details {
@@ -500,6 +513,7 @@ export default {
 	cursor: pointer;
 	margin-top: 10px;
 	margin-left: 10px;
+
 }
 
 .telegram-detail-box {

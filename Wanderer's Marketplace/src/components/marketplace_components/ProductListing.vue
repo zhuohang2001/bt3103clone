@@ -85,8 +85,8 @@
             listingStatus: data.ListingStatus,
             quantity: data.Quantity,
             size: data.Size,
-            timeCreation: data.timeCreation, 
-            userID: data.UserID
+            timeCreation: data.TimeCreation, 
+            userID: data.UserID,
             // Add other product details you want to display...
           };
         })

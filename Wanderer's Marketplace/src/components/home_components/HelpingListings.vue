@@ -99,9 +99,9 @@
                             listingStatus: data.ListingStatus,
                             quantity: data.Quantity,
                             size: data.Size,
-                            timeCreation: data.timeCreation,
-                            userID: data.userID,
-                            status: data.ListingStatus
+                            timeCreation: data.TimeCreation,
+                            userID: data.UserID,
+                            status: data.ListingStatus,
                         };
                     });
                     products = products.concat(chunkProducts);
