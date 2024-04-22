@@ -146,23 +146,17 @@ h1 {
 	display: flex;
 	justify-content: center;
 	align-items: stretch;
-	height: calc(100vh - 80px);
-	padding-left: 50px;
-	padding-top: 10px;
-	gap: 25px;
+	padding: 10px; /* Provides padding around the entire container */
+	gap: 25px; /* Space between the left and right sections */
+	margin: 0 auto; /* Centers the container if there is a specified width */
 }
 
-.left {
-	flex: 1;
+.left, .right {
+	flex: 1; /* Both take up equal space */
+	padding: 20px; /* Provides padding within each section */
+	box-sizing: border-box; /* Includes padding in the element's total width and height */
 }
 
-.right {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	position: relative;
-}
 
 .add-listing-button {
 	padding: 10px 20px;
@@ -173,4 +167,17 @@ h1 {
 	cursor: pointer;
 	margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+	.product-details-container {
+		flex-direction: column; /* Stacks children vertically on smaller screens */
+	}
+
+	.left, .right {
+		width: calc(100% - 40px); /* Reduces the width to account for padding */
+		max-width: 600px; /* Ensure max-width is consistent */
+		margin: auto; /* Centers the containers */
+	}
+}
+
 </style>
