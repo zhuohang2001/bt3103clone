@@ -101,6 +101,18 @@ export default {
 				return; // Stop the function here
 			}
 
+			// Check if minPrice > maxPrice
+			if (minProductPrice > maxProductPrice) {
+				alert("Min. Product Price cannot be higher than Max. Product Price.")
+				return;
+			}
+
+			// Preferred Date of Delivery must be in the future
+			if (estimatedDeliveryDate < dateCreation) {
+				alert("Preferred Date of Delivery must be in the future.")
+				return;
+			}
+
 			alert("Created your listing for: " + productName);
 
 			try {
