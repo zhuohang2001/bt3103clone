@@ -173,7 +173,14 @@ input[type="number"] {
   border-radius: 5px;
   border: 1px solid #ccc;
 }
-
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* This will center the buttons */
+  gap: 0.5rem; /* Maintain the gap between buttons */
+  
+}
 .action-buttons button {
   width: 100%;
   padding: 0.5rem;
@@ -189,6 +196,7 @@ input[type="number"] {
   padding: 0.5rem;
   border-radius: 5px;
   cursor: pointer;
+  margin-left: 2rem;
 }
 
 .reset-button {
