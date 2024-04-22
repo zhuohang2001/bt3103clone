@@ -182,8 +182,7 @@ export default {
 					listingStatus: "Available",
 					userID: "",
 				}
-				
-			)
+			);
 		},
 		acceptedOfferDetails() {
 			if (!this.acceptedOffer || !this.offerUser) {
@@ -193,32 +192,33 @@ export default {
 					offerPrice: "Loading...",
 				};
 			}
-      if (this.user.uid === this.productDetails.userID) {
-		console.log("abccc", this.offerUser.username);
-        return {
-          username: this.offerUser.username,
-          telegram: this.offerUser.telegramHandle,
-          offerPrice: this.acceptedOffer.OfferPrice,
-        };
-      } else {
-		console.log("nnvvs", this.listingUser.username);
-        return {
-          username: this.listingUser.username,
-          telegram: this.listingUser.telegramHandle,
-          offerPrice: this.acceptedOffer.OfferPrice,
-
-        };
-	};
+			if (this.user.uid === this.productDetails.userID) {
+				console.log("abccc", this.offerUser.username);
+				return {
+					username: this.offerUser.username,
+					telegram: this.offerUser.telegramHandle,
+					offerPrice: this.acceptedOffer.OfferPrice,
+				};
+			} else {
+				console.log("nnvvs", this.listingUser.username);
+				return {
+					username: this.listingUser.username,
+					telegram: this.listingUser.telegramHandle,
+					offerPrice: this.acceptedOffer.OfferPrice,
+				};
+			}
 		},
 		isCurrentUserTheLister() {
-			console.log('Current user:', this.user.uid);
-			console.log('Listing user:', this.productDetails.userID);
-			return this.user && this.productDetails && this.user.uid === this.productDetails.userID;
+			console.log("Current user:", this.user.uid);
+			console.log("Listing user:", this.productDetails.userID);
+			return (
+				this.user &&
+				this.productDetails &&
+				this.user.uid === this.productDetails.userID
+			);
 		},
 		isTraveller() {
-			return (
-				this.user.uid === this.productDetails.UserID
-			);
+			return this.user.uid === this.productDetails.UserID;
 		},
 
 		buttonConfig() {
@@ -253,20 +253,16 @@ export default {
 	},
 	methods: {
 		leaveRating() {
-			if (!this.acceptedOffer) {
-				console.error("acceptedOffer is null, cannot navigate to LeaveRating.");
-				return;
-			}
 			this.$router
 				.push({
 					name: "LeaveRating",
 					params: {
-						listingUser: this.productDetails.UserID,
-						offerUser: this.acceptedOffer.OfferByUserID,
+						listingUser: this.currentListing.userID,
+						offerUser: this.currentListing.acceptedOfferUserID,
 					},
 				})
-				.catch((err) => {
-					console.error("Router navigation error:", err);
+				.catch((error) => {
+					console.error("Router navigation error:", error);
 				});
 		},
 		extendOffer() {
@@ -329,7 +325,7 @@ export default {
 						this.acceptedOffer = querySnapshot.docs[0].data();
 						console.log("acceptedOffer133", this.acceptedOffer);
 						const offerUserID = this.acceptedOffer.OfferByUserID;
-  						await this.fetchOfferUser(offerUserID);
+						await this.fetchOfferUser(offerUserID);
 						await this.fetchUserDetails(this.productDetails.userID);
 					} else {
 						console.error("No accepted offers found for this listing.");
@@ -340,7 +336,6 @@ export default {
 					this.acceptedOffer = null;
 				}
 			}
-			
 		},
 		async fetchOfferUser(userID) {
 			try {
@@ -413,14 +408,14 @@ export default {
 
 <style scoped>
 .action-button.pending-offer {
-  background-color: #a9a9a9; /* Replace with the exact color from the screenshot */
-  color: #000; /* Adjust if your button text color is different */
-  border: 1px solid #a9a9a9; /* Use the same color for a solid button look or different for border */
+	background-color: #a9a9a9; /* Replace with the exact color from the screenshot */
+	color: #000; /* Adjust if your button text color is different */
+	border: 1px solid #a9a9a9; /* Use the same color for a solid button look or different for border */
 }
 
 .action-button.pending-offer:hover {
-  background-color: #a9a9a9; /* Darker color for hover effect, adjust as needed */
-  border-color: #a9a9a9; /* Border color change on hover, adjust as needed */
+	background-color: #a9a9a9; /* Darker color for hover effect, adjust as needed */
+	border-color: #a9a9a9; /* Border color change on hover, adjust as needed */
 }
 
 .product-details-container {
@@ -513,7 +508,6 @@ export default {
 	cursor: pointer;
 	margin-top: 10px;
 	margin-left: 10px;
-
 }
 
 .telegram-detail-box {

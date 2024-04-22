@@ -84,7 +84,8 @@ export default {
             size: data.Size,
             timeCreation: data.timeCreation, 
             userID: data.UserID,
-            status: data.ListingStatus
+            status: data.ListingStatus,
+            acceptedOfferUserID: data.AcceptedOfferUserID,
           };
         });
         console.log(this.products)
