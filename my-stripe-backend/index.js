@@ -8,18 +8,18 @@ const stripe = Stripe('sk_test_51P6wEnESKHXx7boldeaqhaZxdn0GAqzlMYKTlDuoVnFA33xT
 
 const app = express();
 
-// const corsOptions = {
-//   origin: [
-//     'http://localhost:5173',   // Your local dev environment
-//     // You can add more domains here
-//   ],
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   credentials: true, // required to pass
-//   allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
-// };
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',   // Your local dev environment
+    // You can add more domains here
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // required to pass
+  allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
+};
 
 
-app.use(cors()); // This will enable CORS for all routes and origins
+app.use(cors(corsOptions)); // This will enable CORS for all routes and origins
 app.use(bodyParser.json());
 
 // Enable CORS for your frontend domain
