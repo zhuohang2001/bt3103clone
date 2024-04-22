@@ -53,6 +53,7 @@
 						>Passwords do not match!</span
 					>
 				</div>
+				<!--
 				<div class="form-group">
 					<label for="cardholderName">Cardholder Name</label>
 					<input
@@ -93,6 +94,7 @@
 						v-model="expiryDate"
 					/>
 				</div>
+				-->
 				<div class="form-group">
 					<label for="telegramHandle">Telegram Handle</label>
 					<input
@@ -273,31 +275,31 @@
 					// Check if the password and confirm password match
 					if (this.password !== this.confirmPassword) {
 						throw new Error("Passwords do not match!");
-					}
+					} 
 					// Check if the cardholder name is empty or contains only spaces
-					if (!this.cardholderName || this.cardholderName.trim() === "") {
-						throw new Error("Please provide a valid cardholder name.");
-					}
-					// Check if the card number is empty or contains only spaces
-					if (!this.cardNumber || this.cardNumber.trim() === "") {
-						throw new Error("Please provide a valid card number.");
-					}
-					// Check if the card number contains only numbers
-					if (!/^\d+$/.test(this.cardNumber)) {
-						throw new Error("Card number must contain numbers only.");
-					}
-					// Check if the CVV is empty or contains only spaces
-					if (!this.CVV || this.CVV.trim() === "") {
-						throw new Error("Please provide a valid CVV.");
-					}
-					// Check if CVV has exactly three digits
-					if (!/^\d{3}$/.test(this.CVV)) {
-						throw new Error("CVV must be a 3-digit number.");
-					}
-					// Check if the expiry date is filled in
-					if (!this.expiryDate) {
-						throw new Error("Please provide an expiry date.");
-					}
+					// if (!this.cardholderName || this.cardholderName.trim() === "") {
+					// 	throw new Error("Please provide a valid cardholder name.");
+					// }
+					// // Check if the card number is empty or contains only spaces
+					// if (!this.cardNumber || this.cardNumber.trim() === "") {
+					// 	throw new Error("Please provide a valid card number.");
+					// }
+					// // Check if the card number contains only numbers
+					// if (!/^\d+$/.test(this.cardNumber)) {
+					// 	throw new Error("Card number must contain numbers only.");
+					// }
+					// // Check if the CVV is empty or contains only spaces
+					// if (!this.CVV || this.CVV.trim() === "") {
+					// 	throw new Error("Please provide a valid CVV.");
+					// }
+					// // Check if CVV has exactly three digits
+					// if (!/^\d{3}$/.test(this.CVV)) {
+					// 	throw new Error("CVV must be a 3-digit number.");
+					// }
+					// // Check if the expiry date is filled in
+					// if (!this.expiryDate) {
+					// 	throw new Error("Please provide an expiry date.");
+					// }
 					// Check if the telegram handle is empty or contains only spaces
 					if (!this.telegramHandle || this.telegramHandle.trim() === "") {
 						throw new Error("Please provide a valid Telegram handle.");
