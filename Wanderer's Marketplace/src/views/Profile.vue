@@ -453,7 +453,21 @@ export default {
 	justify-content: center;
 	align-items: center;
 }
+#FirstDiv {
+  display: flex;
+  justify-content: space-between; /* This will space out the logo, username, and logout button */
+  align-items: center;
+  padding: 0 20px; /* Adjust padding as needed */
+  /* Other styles... */
+}
 
+#Username {
+  flex-grow: 1; /* This will make the center div grow and take up the available space */
+  display: flex;
+  justify-content: center; /* This will center the username text */
+  align-items: center;
+	
+}
 #SecondDiv,
 #FourthDiv {
 	height: 360px;
