@@ -374,6 +374,7 @@ export default {
 }
 
 #Username {
+	margin-left: 9%;
 	flex-grow: 1; /* This will make the center div grow and take up the available space */
 	display: flex;
 	justify-content: center; /* This will center the username text */
