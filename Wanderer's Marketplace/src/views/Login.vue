@@ -162,7 +162,7 @@ export default {
   margin-left: -7%; /* Adjusted position of the line */
   width: 2px; /* Width of the line */
   background-color: #051E55; /* Color of the line */
-  height: 100%;
+  height: 102.5%;
 }
 
 .grey-text{
@@ -197,6 +197,8 @@ export default {
   flex-direction: row; 
   align-items: flex-start;
   margin-left: 0;
+  padding-left: 0;
+  width: 300px;
 }
 
 .login-button {
