@@ -124,7 +124,7 @@ export default {
       const offerDocRef = doc(getFirestore(firebaseApp), "Offers", this.offer.OfferID);
       try {
         await updateDoc(offerDocRef, {
-          purchaseProofImage: imageUrl
+          PurchaseProofImage: imageUrl
         });
         this.$emit('confirmedPurchase', this.listing);
         // this.$router.push('/home');
