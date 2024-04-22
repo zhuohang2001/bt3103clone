@@ -148,15 +148,15 @@
 				confirmPassword: "",
 				//country: '',
 				countryNames: [],
-				cardholderName: "",
-				cardNumber: "",
-				CVV: "",
-				expiryDate: "",
+				//cardholderName: "",
+				//cardNumber: "",
+				//CVV: "",
+				//expiryDate: "",
 				telegramHandle: "",
 				error: "",
 				user: null,
 				defaultPhotoURL: "",
-				stripeUserId: ""
+				stripeUserID: ""
 			};
 		},
 		computed: {
@@ -318,25 +318,25 @@
 					// Show alert after verification email is sent
 					alert('Verification email sent! Please check your inbox and verify your email before logging in.');
 					const accountId = await this.createStripeConnectedAccount();
-					this.stripeUserId = accountId;
+					this.stripeUserID = accountId;
 					const res = await this.generateStripeLink(accountId);
-					if (!this.stripeUserId || this.stripeUserId.trim() === "") {
+					if (!this.stripeUserID || this.stripeUserID.trim() === "") {
 						throw new Error("Please provide a valid Stripe User Id.");
 					}
-					this.checkStripeAccountId(this.stripeUserId)
+					this.checkStripeAccountId(this.stripeUserID)
 
 					// Save user details to Firestore
 					//const db = app.firestore();
 					await setDoc(doc(db, "Users", user.uid), {
 						username: this.username,
 						email: this.email,
-						cardholderName: this.cardholderName,
-						cardNumber: this.cardNumber,
-						CVV: this.CVV,
-						expiryDate: this.expiryDate,
+						//cardholderName: this.cardholderName,
+						//cardNumber: this.cardNumber,
+						//CVV: this.CVV,
+						//expiryDate: this.expiryDate,
 						telegramHandle: this.telegramHandle,
 						profilePhoto: this.defaultPhotoURL,
-						stripeUserId: this.stripeUserId
+						stripeUserID: this.stripeUserID
 					});
 					// If account creation is successful, redirect to home or login page
 					window.location.href = res

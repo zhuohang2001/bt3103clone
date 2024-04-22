@@ -87,56 +87,17 @@
 					>Please provide a valid Telegram handle.</span
 				><br />
 
-				<label for="cardholderName">Cardholder Name</label>
+				<label for="stripeUserID">Stripe User ID</label>
 				<input
 					type="text"
-					id="cardholderName"
-					name="cardholderName"
-					v-model="cardholderName"
-					:class="{ edited: cardholderNameChanged }"
-					@blur="validateCardholderName"
-				/><span v-if="cardholderNameError" class="error-message"
-					>Please provide a valid cardholder name.</span
+					id="stripeUserID"
+					name="stripeUserID"
+					v-model="stripeUserID"
+					:class="{ edited: stripeUserIDChanged }"
+					@blur="validateStripeUserID"
+				/><span v-if="stripeUserIDError" class="error-message"
+					>Please provide a valid Stripe User ID.</span
 				><br />
-
-				<label for="cardNumber">Card Number</label>
-				<input
-					type="text"
-					id="cardNumber"
-					name="cardNumber"
-					v-model="cardNumber"
-					:class="{ edited: cardNumberChanged }"
-					@blur="validateCardNumber"
-				/><span v-if="cardNumberError" class="error-message"
-					>Please provide a valid card number containing numbers only.</span
-				><br />
-
-				<label for="CVV">CVV</label>
-				<input
-					type="text"
-					id="CVV"
-					name="CVV"
-					v-model="CVV"
-					:class="{ edited: CVVChanged }"
-					@blur="validateCVV"
-				/><span v-if="CVVError" class="error-message"
-					>Please provide a valid 3-digit CVV.</span
-				><br />
-
-				<label for="expiryDate">Expiry Date</label>
-				<input
-					type="text"
-					id="expiryDate"
-					ref="expiryDate"
-					v-model="expiryDate"
-					:class="{ edited: expiryDateChanged }"
-					@blur="validateExpiryDate"
-					readonly
-				/>
-				<span v-if="expiryDateError" class="error-message">
-					Please provide a valid expiry date.
-				</span>
-				<br />
 
 				<button @click="confirmEdits" class="edit-details-button">
 					Confirm Edits
@@ -189,6 +150,7 @@ export default {
 			profilePhoto: "",
 			dateJoined: "",
 			telegramHandle: "",
+			stripeUserID: "",
 			averageRating: 0,
 			numberOfRatings: 0,
 			showCropperModal: false,
@@ -199,15 +161,9 @@ export default {
 			CVV: "",
 			expiryDate: "",
 			initialTelegramHandle: "",
-			initialCardholderName: "",
-			initialCardNumber: "",
-			initialCVV: "",
-			initialExpiryDate: "",
+			initialStripeUserID: "",
 			telegramHandleError: false,
-			cardholderNameError: false,
-			cardNumberError: false,
-			CVVError: false,
-			expiryDateError: false,
+			stripeUserIDError: false,
 		};
 	},
 	methods: {
@@ -220,15 +176,9 @@ export default {
 					const userData = userDocSnapshot.data();
 					this.username = userData.username;
 					this.telegramHandle = userData.telegramHandle;
-					this.cardholderName = userData.cardholderName;
-					this.cardNumber = userData.cardNumber;
-					this.CVV = userData.CVV;
-					this.expiryDate = userData.expiryDate;
+					this.stripeUserID = userData.stripeUserID;
 					this.initialTelegramHandle = userData.telegramHandle;
-					this.initialCardholderName = userData.cardholderName;
-					this.initialCardNumber = userData.cardNumber;
-					this.initialCVV = userData.CVV;
-					this.initialExpiryDate = userData.expiryDate;
+					this.initialStripeUserID = userData.stripeUserID;
 				} else {
 					console.error("User document does not exist for:", user.uid);
 				}
@@ -334,21 +284,21 @@ export default {
 			this.$refs.fileInput.value = ""; // Reset the file input
 		},
 		async confirmEdits() {
+			if (
+				!this.validateTelegramHandle() ||
+				!(await this.validateStripeUserID(this.stripeUserID))
+			) {
+				return;
+			}
 			try {
 				await updateDoc(doc(db, "Users", this.$root.user.uid), {
 					telegramHandle: this.telegramHandle,
-					cardholderName: this.cardholderName,
-					cardNumber: this.cardNumber,
-					CVV: this.CVV,
-					expiryDate: this.expiryDate,
+					stripeUserID: this.stripeUserID,
 				});
 				alert("Your details have been updated successfully.");
 
 				this.initialTelegramHandle = this.telegramHandle;
-				this.initialCardholderName = this.cardholderName;
-				this.initialCardNumber = this.cardNumber;
-				this.initialCVV = this.CVV;
-				this.initialExpiryDate = this.expiryDate;
+				this.initialStripeUserID = this.stripeUserID;
 			} catch (error) {
 				console.error("Error updating user details:", error);
 				alert("There was an error updating your details.");
@@ -361,42 +311,23 @@ export default {
 				this.telegramHandleError = false;
 			}
 		},
-		validateCardholderName() {
-			if (!this.cardholderName || this.cardholderName.trim() === "") {
-				this.cardholderNameError = true;
-			} else {
-				this.cardholderNameError = false;
+		async validateStripeUserID(accountId) {
+			try {
+				const response = await fetch(
+					`http://localhost:3000/check-stripe-account/${accountId}`,
+					{
+						method: "GET",
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+				const data = await response.json();
+				if (!response.ok) throw new Error(data.error);
+				this.stripeUserIDError = true;
+			} catch (error) {
+				console.error("Stripe account validation failed:", error);
+				this.stripeUserIDError = true;
 			}
 		},
-		validateCardNumber() {
-			if (
-				!this.cardNumber ||
-				this.cardNumber.trim() === "" ||
-				!/^\d+$/.test(this.cardNumber)
-			) {
-				this.cardNumberError = true;
-			} else {
-				this.cardNumberError = false;
-			}
-		},
-		validateCVV() {
-			if (!this.CVV || this.CVV.trim() === "" || !/^\d{3}$/.test(this.CVV)) {
-				this.CVVError = true;
-			} else {
-				this.CVVError = false;
-			}
-		},
-		/* validateExpiryDate() {
-			const expiryMonth = parseInt(this.expiryDate.split("/")[0], 10);
-			const expiryYear = parseInt(this.expiryDate.split("/")[1], 10);
-			const expiryDateObject = new Date(expiryYear, expiryMonth, 0);
-			const currentDate = new Date();
-			if (expiryDateObject < currentDate) {
-				this.expiryDateError = true;
-			} else {
-				this.expiryDateError = false;
-			}
-		}, */
 	},
 	mounted() {
 		const auth = getAuth();
@@ -408,32 +339,13 @@ export default {
 				console.log("No user found");
 			}
 		});
-		this.$nextTick(() => {
-			flatpickr(this.$refs.expiryDate, {
-				plugins: [new monthSelectPlugin({ dateFormat: "m/Y" })],
-				minDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-				onChange: (selectedDates, dateStr) => {
-					this.expiryDate = dateStr;
-					console.log(dateStr);
-				},
-			});
-		});
 	},
 	computed: {
 		telegramHandleChanged() {
 			return this.telegramHandle !== this.initialTelegramHandle;
 		},
-		cardholderNameChanged() {
-			return this.cardholderName !== this.initialCardholderName;
-		},
-		cardNumberChanged() {
-			return this.cardNumber !== this.initialCardNumber;
-		},
-		CVVChanged() {
-			return this.CVV !== this.initialCVV;
-		},
-		expiryDateChanged() {
-			return this.expiryDate !== this.initialExpiryDate;
+		stripeUserIDChanged() {
+			return this.stripeUserID !== this.initialStripeUserID;
 		},
 	},
 };
@@ -453,7 +365,21 @@ export default {
 	justify-content: center;
 	align-items: center;
 }
+#FirstDiv {
+	display: flex;
+	justify-content: space-between; /* This will space out the logo, username, and logout button */
+	align-items: center;
+	padding: 0 20px; /* Adjust padding as needed */
+	/* Other styles... */
+}
 
+#Username {
+	margin-left: 9%;
+	flex-grow: 1; /* This will make the center div grow and take up the available space */
+	display: flex;
+	justify-content: center; /* This will center the username text */
+	align-items: center;
+}
 #SecondDiv,
 #FourthDiv {
 	height: 360px;
