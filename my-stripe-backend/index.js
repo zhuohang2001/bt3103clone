@@ -11,7 +11,7 @@ const app = express();
 const corsOptions = {
   origin: [
     'http://localhost:5173',
-    'https://wanderer-s-marketplace.web.app/'   // Your local dev environment
+    'https://wanderer-s-marketplace.web.app'   // Your local dev environment
     // You can add more domains here
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
